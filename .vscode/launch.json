@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET API (PersonalSite.Api)",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/api/PersonalSite.Api/PersonalSite.Api.csproj",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5000"
+      }
+    },
+    {
+      "name": ".NET API (Attach)",
+      "type": "dotnet",
+      "request": "attach"
+    },
+    {
+      "name": "Astro Dev Server",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/src/site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Admin PWA Dev Server",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/src/admin",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (API + Site)",
+      "configurations": [".NET API (PersonalSite.Api)", "Astro Dev Server"]
+    }
+  ]
+}

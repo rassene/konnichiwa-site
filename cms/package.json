@@ -1,0 +1,26 @@
+{
+  "name": "sarah-cms",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Strapi CMS for sarah.tn",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/strapi": "^4.25.9",
+    "@strapi/plugin-users-permissions": "^4.25.9",
+    "@strapi/plugin-i18n": "^4.25.9",
+    "@strapi/provider-upload-azure-storage": "^1.0.0",
+    "better-sqlite3": "^9.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=20.x.x",
+    "npm": ">=6.0.0"
+  }
+}

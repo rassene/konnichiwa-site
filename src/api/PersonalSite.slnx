@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="PersonalSite.Api/PersonalSite.Api.csproj" />
+  <Project Path="PersonalSite.Application/PersonalSite.Application.csproj" />
+  <Project Path="PersonalSite.Domain/PersonalSite.Domain.csproj" />
+  <Project Path="PersonalSite.Infrastructure/PersonalSite.Infrastructure.csproj" />
+  <Project Path="PersonalSite.Tests/PersonalSite.Tests.csproj" />
+</Solution>

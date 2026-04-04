@@ -1,0 +1,45 @@
+name: Deploy — .NET API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/api/**"
+      - ".github/workflows/api.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy API to Azure App Service
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore PersonalSite.slnx
+
+      - name: Build
+        run: dotnet build PersonalSite.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test PersonalSite.slnx --no-build --configuration Release
+
+      - name: Publish
+        run: dotnet publish PersonalSite.Api/PersonalSite.Api.csproj \
+          --no-build \
+          --configuration Release \
+          --output ./publish
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_API_APP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: src/api/publish

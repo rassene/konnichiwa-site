@@ -1,0 +1,14 @@
+FROM node:20-alpine
+
+WORKDIR /srv/app
+
+# Install dependencies first (layer cache)
+COPY package*.json ./
+RUN npm install
+
+# Copy source
+COPY . .
+
+EXPOSE 1337
+
+CMD ["npm", "run", "develop"]

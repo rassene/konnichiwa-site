@@ -127,7 +127,7 @@ specs/main/
   │   │       ├── hooks/          ← useSignalR, usePush, useAuth
   │   │       └── services/       ← API client, auth service
   │   └── api/                    ← .NET 10 solution (Clean Architecture)
-  │       ├── PersonalSite.sln
+  │       ├── PersonalSite.slnx
   │       ├── PersonalSite.Domain/              ← entities, value objects (no deps)
   │       ├── PersonalSite.Application/         ← use cases, interfaces, DTOs
   │       ├── PersonalSite.Infrastructure/      ← EF Core, email, push, SignalR, jobs

@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  # ── SQL Server 2022 ───────────────────────────────────────────────────────
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sarah-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Dev_Strong_P@ssword1"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Dev_Strong_P@ssword1" -Q "SELECT 1" -No
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ── Strapi CMS ────────────────────────────────────────────────────────────
+  strapi:
+    build:
+      context: ./cms
+      dockerfile: Dockerfile.dev
+    container_name: sarah-strapi
+    environment:
+      NODE_ENV: development
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: /srv/app/data.db
+      STRAPI_ADMIN_BACKEND_URL: http://localhost:1337
+      # Azure Blob Storage (for media uploads — set real values locally)
+      AZURE_STORAGE_ACCOUNT: ""
+      AZURE_STORAGE_ACCOUNT_KEY: ""
+      AZURE_STORAGE_CONTAINER_NAME: "media"
+      CDN_BASE_URL: ""
+    ports:
+      - "1337:1337"
+    volumes:
+      - ./cms:/srv/app
+      - strapi-data:/srv/app/data.db
+      - /srv/app/node_modules
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+volumes:
+  sqlserver-data:
+  strapi-data:

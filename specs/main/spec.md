@@ -651,7 +651,7 @@ Api (outermost — depends on all; ASP.NET Core 10 entry point, controllers, mid
 
 ```
 src/api/
-  PersonalSite.sln
+  PersonalSite.slnx
   PersonalSite.Domain/
     Entities/           ← Visitor, Subscriber, ContactSubmission, …
     Enums/
@@ -750,7 +750,7 @@ winget install Microsoft.AzureStorageExplorer
   │   ├── site/                    ← Astro public site
   │   ├── admin/                   ← Admin PWA (React SPA)
   │   └── api/                     ← .NET solution
-  │       ├── PersonalSite.sln
+  │       ├── PersonalSite.slnx
   │       ├── PersonalSite.Api/
   │       ├── PersonalSite.Application/
   │       ├── PersonalSite.Domain/
@@ -789,7 +789,7 @@ winget install Microsoft.AzureStorageExplorer
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[csharp]": { "editor.defaultFormatter": "ms-dotnettools.csdevkit" },
-  "dotnet.defaultSolution": "src/api/PersonalSite.sln",
+  "dotnet.defaultSolution": "src/api/PersonalSite.slnx",
   "typescript.tsdk": "src/site/node_modules/typescript/lib"
 }
 ```
@@ -1021,9 +1021,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: '10.0.x' }
-      - run: dotnet restore src/api/PersonalSite.sln
-      - run: dotnet build src/api/PersonalSite.sln --no-restore -c Release
-      - run: dotnet test src/api/PersonalSite.sln --no-build -c Release
+      - run: dotnet restore src/api/PersonalSite.slnx
+      - run: dotnet build src/api/PersonalSite.slnx --no-restore -c Release
+      - run: dotnet test src/api/PersonalSite.slnx --no-build -c Release
 
   lighthouse:
     needs: build-site
