@@ -33,6 +33,11 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# ── Self-hosted fonts (download per T017 — not committed due to licensing) ──
+src/site/public/fonts/*.woff2
+src/site/public/fonts/*.woff
+src/site/public/fonts/*.ttf
+
 # ── Strapi ──────────────────────────────────────────────────────────────────
 cms/.tmp/
 cms/public/uploads/

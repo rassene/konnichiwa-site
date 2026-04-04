@@ -1,0 +1,68 @@
+---
+// Shell layer — base HTML layout composing NavBar + slot + Footer.
+// Applies global.css; provides SEO meta tags.
+import NavBar from '../components/NavBar.astro';
+import Footer from '../components/Footer.astro';
+import '../design/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;      // absolute URL for Open Graph image
+  noIndex?: boolean;
+}
+
+const {
+  title,
+  description = 'A personal corner of the internet — projects, readings, musings, and more.',
+  ogImage,
+  noIndex = false,
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).toString();
+const fullTitle = title === 'Home' ? 'konnichiwa.' : `${title} — konnichiwa.`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/* Favicon */}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {/* SEO */}
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+    {/* Open Graph */}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    {/* Twitter Card */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    {/* Preconnect for CDN (set CDN_BASE_URL in env) */}
+    {import.meta.env.CDN_BASE_URL && (
+      <link rel="preconnect" href={import.meta.env.CDN_BASE_URL} />
+    )}
+  </head>
+  <body>
+    <NavBar />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer>
+      <slot name="newsletter" slot="newsletter" />
+    </Footer>
+  </body>
+</html>

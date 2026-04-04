@@ -1,0 +1,54 @@
+---
+// Shell layer — accessible loading spinner.
+interface Props {
+  label?: string;  // accessible label for screen readers
+}
+
+const { label = 'Loading…' } = Astro.props;
+---
+
+<div class="loading" role="status" aria-label={label}>
+  <span class="loading__spinner" aria-hidden="true"></span>
+  <span class="loading__label">{label}</span>
+</div>
+
+<style>
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+  }
+
+  .loading__spinner {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .loading__spinner {
+      animation: spin 0.7s linear infinite;
+    }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Visually hide label but keep it for screen readers */
+  .loading__label {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+</style>

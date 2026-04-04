@@ -1,0 +1,179 @@
+---
+// Shell layer — sticky top navigation bar.
+// Hamburger menu on mobile; inline links on md+.
+// No JS hydration needed — toggle handled via CSS :has() + checkbox trick
+// (zero-JS baseline, ≤50 KB budget respected).
+const NAV_LINKS = [
+  { href: '/',          label: 'Home'     },
+  { href: '/projects',  label: 'Projects' },
+  { href: '/resume',    label: 'Resume'   },
+  { href: '/readings',  label: 'Readings' },
+  { href: '/musings',   label: 'Musings'  },
+  { href: '/reach-out', label: 'Reach Out'},
+  { href: '/links',     label: 'Links'    },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="navbar" role="banner">
+  <nav class="navbar__inner" aria-label="Main navigation">
+    <a class="navbar__logo" href="/" aria-label="Home">
+      konnichiwa<span aria-hidden="true">.</span>
+    </a>
+
+    {/* Checkbox-based toggle — no JS required */}
+    <input
+      type="checkbox"
+      id="nav-toggle"
+      class="navbar__toggle-input"
+      aria-hidden="true"
+    />
+    <label class="navbar__hamburger" for="nav-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+
+    <ul class="navbar__links" role="list">
+      {NAV_LINKS.map(({ href, label }) => (
+        <li>
+          <a
+            href={href}
+            class:list={['navbar__link', { 'navbar__link--active': currentPath === href || (href !== '/' && currentPath.startsWith(href)) }]}
+            aria-current={currentPath === href ? 'page' : undefined}
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 var(--space-md);
+  }
+
+  .navbar__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    max-width: 1280px;
+    margin: 0 auto;
+    height: 56px;
+  }
+
+  .navbar__logo {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .navbar__logo span {
+    color: var(--color-accent);
+  }
+
+  .navbar__toggle-input {
+    display: none;
+  }
+
+  .navbar__hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    margin-left: auto;
+    padding: var(--space-sm);
+  }
+
+  .navbar__hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: var(--color-text);
+    border-radius: var(--radius-full);
+    transition: transform var(--motion-base), opacity var(--motion-base);
+  }
+
+  .navbar__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    list-style: none;
+    margin-left: auto;
+  }
+
+  .navbar__link {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    transition: color var(--motion-fast), background-color var(--motion-fast);
+  }
+
+  .navbar__link:hover {
+    color: var(--color-text);
+    background-color: var(--color-accent-soft);
+  }
+
+  .navbar__link--active {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  /* Mobile */
+  @media (max-width: 767px) {
+    .navbar__hamburger {
+      display: flex;
+    }
+
+    .navbar__links {
+      display: none;
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: var(--space-sm) 0;
+      margin-left: 0;
+    }
+
+    .navbar__link {
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: 0;
+    }
+
+    /* CSS-only toggle via :has() */
+    .navbar:has(#nav-toggle:checked) .navbar__links {
+      display: flex;
+    }
+
+    .navbar:has(#nav-toggle:checked) .navbar__hamburger span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .navbar:has(#nav-toggle:checked) .navbar__hamburger span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .navbar:has(#nav-toggle:checked) .navbar__hamburger span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+  }
+</style>

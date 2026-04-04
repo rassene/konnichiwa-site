@@ -1,0 +1,45 @@
+---
+// Shell layer — error fallback display for failed content loads.
+interface Props {
+  message?: string;
+  class?: string;
+}
+
+const { message = 'Something went wrong. Please try again later.', class: className } = Astro.props;
+---
+
+<div class:list={['error-boundary', className]} role="alert" aria-live="assertive">
+  <svg
+    class="error-boundary__icon"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <p class="error-boundary__message">{message}</p>
+</div>
+
+<style>
+  .error-boundary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    border-radius: var(--radius-md);
+    background-color: color-mix(in srgb, var(--color-accent) 5%, transparent);
+    color: var(--color-accent);
+  }
+
+  .error-boundary__icon {
+    flex-shrink: 0;
+  }
+
+  .error-boundary__message {
+    font-size: 0.9375rem;
+  }
+</style>

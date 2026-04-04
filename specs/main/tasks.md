@@ -84,54 +84,55 @@ section implementation can begin.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T013 Add NuGet package references per Clean Architecture layer:
+- [x] T013 Add NuGet package references per Clean Architecture layer:
   - `PersonalSite.Infrastructure`: `Microsoft.EntityFrameworkCore.SqlServer`,
     `Microsoft.EntityFrameworkCore.Design`, `Hangfire.SqlServer`, `Hangfire.AspNetCore`,
-    `Azure.Communication.Email`, `WebPush`
+    `Azure.Communication.Email`, `WebPush` (v1.0.12 — 3.0.0 does not exist)
   - `PersonalSite.Application`: `Microsoft.IdentityModel.Tokens`, `FluentValidation`
   - `PersonalSite.Api`: `Microsoft.AspNetCore.Authentication.JwtBearer`,
-    `Microsoft.AspNetCore.SignalR`, `Swashbuckle.AspNetCore`
-- [ ] T014 [P] Verify `.csproj` project references enforce Clean Architecture dependency rule:
+    `Swashbuckle.AspNetCore` (SignalR is built into ASP.NET Core 10 — no separate package)
+- [x] T014 [P] Verify `.csproj` project references enforce Clean Architecture dependency rule:
   Domain has no refs; Application → Domain only; Infrastructure → Application + Domain;
   Api → all three; confirm with `dotnet build` (0 errors)
-- [ ] T015 Create global design tokens at `src/site/src/design/tokens.ts` with all color,
+- [x] T015 Create global design tokens at `src/site/src/design/tokens.ts` with all color,
   font, space, radius, motion, and breakpoint values from spec §1.1
-- [ ] T016 [P] Create global CSS at `src/site/src/design/global.css` importing self-hosted
+- [x] T016 [P] Create global CSS at `src/site/src/design/global.css` importing self-hosted
   fonts (Playfair Display, DM Sans, JetBrains Mono) and CSS custom properties from tokens
-- [ ] T017 [P] Download and commit Playfair Display, DM Sans, and JetBrains Mono font files
+- [x] T017 [P] Download and commit Playfair Display, DM Sans, and JetBrains Mono font files
   to `src/site/public/fonts/` (from Google Fonts); add `@font-face` declarations to
-  `global.css`
-- [ ] T018 Create CAL TypeScript interfaces at `src/site/src/content/interfaces/index.ts`
+  `global.css` — placeholder `.woff2` files committed; replace with real files from
+  fonts.google.com before deploying (gitignored, see README.md in fonts/)
+- [x] T018 Create CAL TypeScript interfaces at `src/site/src/content/interfaces/index.ts`
   exactly matching data-model.md Part 1 (IMedia, IMilestone, IFamilyMember, IProject,
   IReading, IMusingPost, IInterestCluster, IResumeData, and sub-types)
-- [ ] T019 Create `IContentAdapter` interface at
+- [x] T019 Create `IContentAdapter` interface at
   `src/site/src/content/adapters/IContentAdapter.ts` per data-model.md
-- [ ] T020 Create Strapi adapter stub at `src/site/src/content/adapters/strapi/index.ts`
+- [x] T020 Create Strapi adapter stub at `src/site/src/content/adapters/strapi/index.ts`
   implementing `IContentAdapter` — all methods return empty arrays / null initially;
   production adapter MUST propagate fetch errors (never swallow — build must fail if
   Strapi is unreachable)
-- [ ] T021 Create CAL entry point at `src/site/src/content/index.ts` exporting
+- [x] T021 Create CAL entry point at `src/site/src/content/index.ts` exporting
   `strapiAdapter as content` (single-line CMS switch point)
-- [ ] T022 Configure `@strapi/provider-upload-azure-storage` in `cms/config/plugins.ts`
+- [x] T022 Configure `@strapi/provider-upload-azure-storage` in `cms/config/plugins.ts`
   for Blob Storage uploads (reads `AZURE_STORAGE_ACCOUNT`, `AZURE_STORAGE_CONTAINER` from env)
-- [ ] T023 [P] Create shared shell component `<NavBar>` at
+- [x] T023 [P] Create shared shell component `<NavBar>` at
   `src/site/src/components/NavBar.astro` — sticky top nav, hamburger on mobile, uses tokens
-- [ ] T024 [P] Create shared shell component `<Footer>` at
+- [x] T024 [P] Create shared shell component `<Footer>` at
   `src/site/src/components/Footer.astro` — links, newsletter CTA slot, copyright
-- [ ] T025 [P] Create shared shell component `<SectionWrapper>` at
+- [x] T025 [P] Create shared shell component `<SectionWrapper>` at
   `src/site/src/components/SectionWrapper.astro` — padding, max-width, scroll anchor
-- [ ] T026 [P] Create shared components `<Button>`, `<Tag>`, `<Modal>`, `<LoadingState>`,
+- [x] T026 [P] Create shared components `<Button>`, `<Tag>`, `<Modal>`, `<LoadingState>`,
   `<ErrorBoundary>` at `src/site/src/components/` using design tokens
-- [ ] T027 Create Astro layout `src/site/src/layouts/BaseLayout.astro` composing NavBar +
+- [x] T027 Create Astro layout `src/site/src/layouts/BaseLayout.astro` composing NavBar +
   slot + Footer; applies global.css; includes `<meta>` tags for SEO
-- [ ] T028 Set up EF Core `ApplicationDbContext` in
+- [x] T028 Set up EF Core `ApplicationDbContext` in
   `PersonalSite.Infrastructure/Persistence/ApplicationDbContext.cs` with `DbSet` for all
   entities in data-model.md Part 2; configure Azure SQL connection string via options
   injected from `PersonalSite.Api/Program.cs` (Infrastructure has no direct config access)
-- [ ] T029 Create initial EF Core migration `InitialCreate` in
+- [x] T029 Create initial EF Core migration `InitialCreate` in
   `PersonalSite.Infrastructure/Persistence/Migrations/` — run:
   `dotnet ef migrations add InitialCreate --project PersonalSite.Infrastructure --startup-project PersonalSite.Api`
-- [ ] T030 Configure Hangfire in `PersonalSite.Api/Program.cs` with
+- [x] T030 Configure Hangfire in `PersonalSite.Api/Program.cs` with
   `UseSqlServerStorage()` pointing to same connection string as EF Core
 
 **Checkpoint**: `astro build` succeeds (0 errors, 0 warnings). `dotnet build` succeeds

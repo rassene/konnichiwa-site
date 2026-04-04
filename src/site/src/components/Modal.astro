@@ -1,0 +1,119 @@
+---
+// Shell layer — accessible modal dialog.
+// Requires a small inline script for open/close — justified: dialog accessibility
+// (focus trap, Escape key, aria-modal) cannot be achieved without JS.
+// JS cost: ~0.3 KB inline; does NOT count against the ≤50 KB bundle budget.
+interface Props {
+  id: string;    // unique id; used by trigger buttons via data-modal-target
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<dialog
+  class="modal"
+  id={id}
+  aria-labelledby={`${id}-title`}
+  aria-modal="true"
+>
+  <div class="modal__content">
+    <div class="modal__header">
+      <h2 class="modal__title" id={`${id}-title`}>{title}</h2>
+      <button
+        class="modal__close"
+        aria-label="Close dialog"
+        data-modal-close
+        type="button"
+      >
+        &#x2715;
+      </button>
+    </div>
+    <div class="modal__body">
+      <slot />
+    </div>
+  </div>
+</dialog>
+
+<script>
+  // Minimal modal controller: open via data-modal-target, close via button or Escape.
+  document.querySelectorAll<HTMLElement>('[data-modal-target]').forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      const id = trigger.dataset.modalTarget;
+      const dialog = id ? document.getElementById(id) as HTMLDialogElement | null : null;
+      dialog?.showModal();
+    });
+  });
+
+  document.querySelectorAll<HTMLDialogElement>('dialog.modal').forEach((dialog) => {
+    dialog.querySelector('[data-modal-close]')?.addEventListener('click', () => {
+      dialog.close();
+    });
+
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  });
+</script>
+
+<style>
+  .modal {
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 0;
+    max-width: min(90vw, 560px);
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+
+  .modal::backdrop {
+    background-color: var(--color-overlay);
+    backdrop-filter: blur(2px);
+  }
+
+  .modal__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+    gap: var(--space-md);
+  }
+
+  .modal__title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-text);
+  }
+
+  .modal__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+    line-height: 1;
+    transition: color var(--motion-fast);
+    flex-shrink: 0;
+  }
+
+  .modal__close:hover {
+    color: var(--color-text);
+  }
+
+  .modal__close:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .modal__body {
+    padding: var(--space-lg);
+  }
+</style>

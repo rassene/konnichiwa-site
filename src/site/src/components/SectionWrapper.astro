@@ -1,0 +1,35 @@
+---
+// Shell layer — standard section container with padding, max-width, and scroll anchor.
+interface Props {
+  id?: string;     // scroll anchor id
+  class?: string;  // extra classes from parent
+}
+
+const { id, class: className } = Astro.props;
+---
+
+<section
+  id={id}
+  class:list={['section-wrapper', className]}
+>
+  <div class="section-wrapper__inner">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section-wrapper {
+    padding: var(--space-3xl) var(--space-md);
+  }
+
+  .section-wrapper__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .section-wrapper {
+      padding: var(--space-3xl) var(--space-xl);
+    }
+  }
+</style>

@@ -1,0 +1,30 @@
+---
+// Shell layer — small label tag using design tokens.
+interface Props {
+  color?: string;   // optional custom hex color (for cluster badges)
+  class?: string;
+}
+
+const { color, class: className } = Astro.props;
+const style = color ? `--tag-color: ${color}; background-color: color-mix(in srgb, ${color} 15%, transparent); color: ${color};` : undefined;
+---
+
+<span class:list={['tag', className]} style={style}>
+  <slot />
+</span>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+    white-space: nowrap;
+    line-height: 1.5;
+  }
+</style>
