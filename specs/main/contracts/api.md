@@ -41,9 +41,6 @@ Record a visitor fingerprint. Must be called with user consent (GDPR).
 ```
 
 **Response 400**: Malformed fingerprint.
-**Response 451**: Consent not given (GDPR — EU IP without consent header).
-
-Headers: `X-Consent-Given: true` required for EU IPs.
 
 ---
 

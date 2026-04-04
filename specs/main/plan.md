@@ -22,8 +22,10 @@ mandatory build gate:
 
 ## Technical Context
 
-**Language/Version**: TypeScript (Astro 4.x + React 18), C# (.NET 8), TypeScript (Strapi v4)
-**Primary Dependencies**: Astro 4, React 18, ASP.NET Core 8, Entity Framework Core 8,
+**Language/Version**: TypeScript (Astro 4.x + React 18), C# (.NET 10), TypeScript (Strapi v4)
+**Architecture (.NET API)**: Clean Architecture — Domain → Application → Infrastructure → Api
+  (strict dependency rule; compile-time enforced via project references)
+**Primary Dependencies**: Astro 4, React 18, ASP.NET Core 10, Entity Framework Core 10,
   Strapi v4, Hangfire, `@microsoft/signalr`, `fingerprintjs/fingerprintjs` (OSS),
   Azure Communication Services SDK (.NET)
 **Storage**: Azure SQL Database (EF Core — subscriber, contact, visitor, push sub data);
@@ -124,12 +126,12 @@ specs/main/
   │   │       ├── pages/          ← Dashboard, Contacts, Subscribers, Settings
   │   │       ├── hooks/          ← useSignalR, usePush, useAuth
   │   │       └── services/       ← API client, auth service
-  │   └── api/                    ← .NET solution
+  │   └── api/                    ← .NET 10 solution (Clean Architecture)
   │       ├── PersonalSite.sln
-  │       ├── PersonalSite.Api/          ← ASP.NET Core 8 entry point
-  │       ├── PersonalSite.Application/  ← use cases, interfaces
-  │       ├── PersonalSite.Domain/       ← entities, value objects
-  │       ├── PersonalSite.Infrastructure/ ← EF Core, email, push, SignalR
+  │       ├── PersonalSite.Domain/              ← entities, value objects (no deps)
+  │       ├── PersonalSite.Application/         ← use cases, interfaces, DTOs
+  │       ├── PersonalSite.Infrastructure/      ← EF Core, email, push, SignalR, jobs
+  │       ├── PersonalSite.Api/                 ← ASP.NET Core 10 entry point, controllers
   │       └── PersonalSite.Tests/
   ├── cms/                        ← Strapi v4 project
   └── docker-compose.yml          ← local dev: Strapi + SQL Server

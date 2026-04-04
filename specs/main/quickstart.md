@@ -13,7 +13,7 @@ Install all tools via `winget` (run PowerShell as Administrator):
 
 ```powershell
 winget install OpenJS.NodeJS.LTS         # Node.js LTS (Astro, Strapi, Admin PWA)
-winget install Microsoft.DotNet.SDK.8    # .NET 8 SDK
+winget install Microsoft.DotNet.SDK.10   # .NET 10 SDK
 winget install Microsoft.AzureCLI        # Azure CLI
 winget install Git.Git
 winget install Microsoft.VisualStudioCode
@@ -25,7 +25,7 @@ Verify after install:
 
 ```powershell
 node --version       # v20+
-dotnet --version     # 8.x
+dotnet --version     # 10.x
 az --version
 docker --version
 ```

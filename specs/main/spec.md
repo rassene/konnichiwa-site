@@ -1,5 +1,5 @@
 # SPECIFICATION.md
-> Personal Website — [Firstname].com  
+> Personal Website — sarah.tn  
 > Version 1.1 | Status: Draft  
 > References: CONSTITUTION.md v1.1
 
@@ -17,6 +17,18 @@ Each section of the site is specified as an autonomous module. Each module spec 
 - **Open questions** — unresolved design or content decisions
 
 Cross-cutting concerns (auth, fingerprinting, newsletter, admin PWA) are specified separately at the end.
+
+---
+
+## Clarifications
+
+### Session 2026-04-04
+
+- Q: Is T1 musing post body server-protected or client-side soft-gated? → A: API-fetched body — musing post page (title, excerpt, metadata) is SSG; subscriber-only body is fetched from `GET /api/musings/{slug}/body` using `Authorization: Bearer {subscriberJwt}`; API validates token and cluster membership before returning body HTML (Option B).
+- Q: What happens when a subscriber's 30-day access token expires? → A: Sliding-window renewal — if the subscriber visits while within 7 days of expiry (days 23–30), `POST /api/subscriber/verify` issues a fresh 30-day token transparently; subscribers inactive for 30+ days see gated content locked and must re-subscribe (Option B).
+- Q: Which visual paradigm for Meet the Family `<FamilyScene>`? → A: Illustrated frames — each family member is represented by a custom illustration or illustrated avatar (not a photo); illustrations are uploaded as media assets in Strapi; the scene composition positions illustrated characters spatially (Option A).
+- Q: EU GDPR IP detection mechanism for fingerprinting consent gate? → A: Remove EU visitor consent entirely — fingerprinting proceeds without consent gate or banner; no GDPR detection mechanism needed; ConsentBanner component removed from scope.
+- Q: Should `astro build` tolerate Strapi unavailability (empty data) or hard-fail? → A: Hard-fail — CAL Strapi adapter MUST throw on connection failure; a successful build with empty content is worse than keeping the last working deployment live.
 
 ---
 
@@ -207,6 +219,13 @@ export { strapiAdapter as content } from './adapters/strapi'
 // To switch CMS: replace the above line only
 ```
 
+### 2.4 Adapter Failure Policy
+
+The Strapi adapter MUST throw (not return empty arrays) when Strapi is unreachable at
+build time. This causes `astro build` to exit with a non-zero code, keeping the last
+successful deployment live rather than publishing a blank site. All adapter methods
+propagate network/HTTP errors without swallowing them.
+
 ---
 
 ## 3. Section Specifications
@@ -279,30 +298,38 @@ Uses `IMilestone[]` from CAL.
 **Layer:** Immersive
 
 #### Interaction Model
-- Landing view: an illustrated or photographic "family scene" — members arranged spatially (e.g. around a table, in a garden, on a sofa)
+- Landing view: an illustrated family scene — characters arranged spatially (e.g. around a
+  table, in a garden, on a sofa) using custom illustrations uploaded as media assets
 - Tapping/clicking a family member zooms in and slides in their profile card
-- Profile card: photo, name, relation, tagline, 2–3 fun facts, emoji
+- Profile card: illustrated avatar, name, relation, tagline, 2–3 fun facts, emoji
 - Navigation between members via arrow or swipe
 
 #### Visual Language
 - Warm, playful — distinct from the shell and from Life Map
-- Could use illustrated frames, polaroid-style cards, or comic-panel layout (TBD with owner)
-- Each family member may have a signature color accent
+- **Illustrated frames** — each member is a custom illustrated character (not a photo);
+  illustrations uploaded as SVG or PNG assets in Strapi per member
+- Scene background is also an illustration (e.g. a living room, garden) — uploaded as a
+  single background asset in Strapi
+- Each family member has an optional signature color accent overlaid on their character spot
+- `<FamilyMemberCard>` detail panel shows the illustration prominently alongside text
 
 #### Content Model
-Uses `IFamilyMember[]` from CAL.
+Uses `IFamilyMember[]` from CAL. `IFamilyMember.photo` field holds the illustrated avatar
+asset (renamed semantically to `avatar` in future CAL iteration; use `photo` for now per
+existing interface). Scene background asset referenced via a `scene-config` Strapi single
+type (background image URL, scene dimensions, member spot coordinates).
 
 #### Components
-- `<FamilyScene>` — interactive composition layout
-- `<FamilyMemberSpot>` — positioned, tappable character
-- `<FamilyMemberCard>` — detail panel with fun facts
+- `<FamilyScene>` — interactive illustrated scene; positions `<FamilyMemberSpot>` elements
+  at absolute coordinates read from Strapi `scene-config`
+- `<FamilyMemberSpot>` — positioned illustrated character; tappable/clickable
+- `<FamilyMemberCard>` — detail panel: illustration + name, relation, tagline, fun facts
 - `<FamilyNav>` — prev/next between members
 
 #### Open Questions
-- [ ] How many family members? (affects layout complexity)
-- [ ] Real photos or illustrated avatars? Or both?
-- [ ] Should pets be included?
-- [ ] Privacy: any family member who should be shown with reduced detail?
+- [ ] How many family members? (affects scene composition complexity — target 4–8)
+- [ ] Should pets be included? (content decision — no code impact)
+- [ ] Privacy: any member shown with reduced detail? (content decision)
 
 ---
 
@@ -373,7 +400,12 @@ Uses `IReading[]` from CAL.
 2. Public posts visible immediately
 3. Subscriber-only posts show title + excerpt + "Subscribe to [Cluster Name] to read"
 4. Clicking subscribe CTA → newsletter/subscription flow (see §6.2)
-5. Returning subscriber (token in localStorage or cookie) → content unlocks automatically
+5. Returning subscriber (token in localStorage) → `<MusingPostPage>` is SSG (title, excerpt,
+   metadata rendered at build time); subscriber-only body is **not** in the HTML source —
+   it is fetched client-side from `GET /api/musings/{slug}/body` with
+   `Authorization: Bearer {subscriberJwt}`; API validates token + cluster membership;
+   on success, body HTML is injected into the page; on failure (expired/invalid token),
+   `<SubscriberGate>` is shown in place of the body
 
 #### Content Model
 Uses `IMusingPost[]` and `IInterestCluster[]` from CAL.
@@ -464,17 +496,17 @@ Uses `IResumeData` from CAL.
 **Purpose:** Recognize returning visitors without requiring login. Enables personalized greetings and return-visit analytics.
 
 #### Implementation
-- Client-side: `fingerprintjs/fingerprintjs` (open source) runs on page load
+- Client-side: `fingerprintjs/fingerprintjs` (open source) runs on page load automatically
 - Generated fingerprint hash → POST `/api/visitor/identify`
-- .NET API stores: fingerprint hash, first seen, last seen, visit count, approximate location (from IP geolocation, country only)
+- .NET API stores: fingerprint hash, first seen, last seen, visit count, approximate location
+  (from IP geolocation, country only)
 - No PII stored. Fingerprint is a hash, not linked to identity unless visitor subscribes.
 - On return: API returns `{ returning: true, visitCount: N }`
 - Frontend uses this to optionally render a subtle personalized element on Home
 
 #### Privacy
-- Cookie banner / notice must disclose fingerprinting
-- GDPR-aware: EU visitors must consent before fingerprint is stored
-- Fingerprint data TTL: 12 months, then purged
+- No consent gate or banner required. Fingerprint data TTL: 12 months, then purged by a
+  scheduled background job.
 
 #### API Endpoints
 ```
@@ -497,6 +529,10 @@ Response: { returning: boolean, visitCount: number }
 5. Token stored in `localStorage` under key `sub_token`
 6. On subsequent visits: frontend sends token in header to `/api/subscriber/verify`
 7. Verified token → T1 content unlocks client-side
+8. **Token renewal (sliding window):** if token has ≤ 7 days remaining, `/api/subscriber/verify`
+   issues a fresh 30-day token in the response (`newToken` field); frontend replaces
+   `sub_token` in localStorage transparently. Subscribers inactive for 30+ days must
+   re-subscribe from scratch.
 
 #### Subscriber Record (DB)
 ```
@@ -581,18 +617,62 @@ DELETE /api/newsletter/unsubscribe     — remove subscriber
 
 ## 5. .NET API Specification
 
-### 5.1 Project Structure
+### 5.1 Architecture: Clean Architecture
+
+The .NET API follows **Clean Architecture**. The dependency rule is strict: inner layers
+MUST NOT reference outer layers.
 
 ```
-/api
-  /src
-    PersonalSite.Api/           ← ASP.NET Core 8 entry point
-    PersonalSite.Application/   ← use cases, interfaces
-    PersonalSite.Domain/        ← entities, value objects
-    PersonalSite.Infrastructure/← EF Core, email, push, SignalR
-  /tests
-    PersonalSite.Api.Tests/
-    PersonalSite.Application.Tests/
+Domain (innermost — no dependencies)
+  ↑
+Application (depends on Domain only — use cases, interfaces, DTOs)
+  ↑
+Infrastructure (depends on Application + Domain — EF Core, email, SignalR, push)
+  ↑
+Api (outermost — depends on all; ASP.NET Core 10 entry point, controllers, middleware)
+```
+
+**Layer responsibilities:**
+
+| Layer | Project | Contains |
+|-------|---------|----------|
+| Domain | `PersonalSite.Domain` | Entities, value objects, domain events, enums — no framework dependencies |
+| Application | `PersonalSite.Application` | Use cases (commands/queries), service interfaces (`IEmailService`, `ITokenService`, …), DTOs, validation |
+| Infrastructure | `PersonalSite.Infrastructure` | EF Core `ApplicationDbContext`, repository implementations, `EmailService`, `PushNotificationService`, `TokenService`, Hangfire jobs, SignalR hub |
+| API | `PersonalSite.Api` | ASP.NET Core 10 controllers (or minimal API endpoints), middleware, DI registration, `Program.cs` |
+
+**Rules enforced at compile time via `.csproj` project references:**
+- `PersonalSite.Domain` — no project references
+- `PersonalSite.Application` → `PersonalSite.Domain` only
+- `PersonalSite.Infrastructure` → `PersonalSite.Application` + `PersonalSite.Domain`
+- `PersonalSite.Api` → all three layers
+
+### 5.2 Project File Structure
+
+```
+src/api/
+  PersonalSite.sln
+  PersonalSite.Domain/
+    Entities/           ← Visitor, Subscriber, ContactSubmission, …
+    Enums/
+  PersonalSite.Application/
+    UseCases/           ← one folder per feature (Contact/, Subscriber/, Visitor/, …)
+    Interfaces/         ← IEmailService, ITokenService, ISubscriptionService, …
+    DTOs/
+  PersonalSite.Infrastructure/
+    Persistence/        ← ApplicationDbContext, Migrations/
+    Services/           ← EmailService, TokenService, PushNotificationService, …
+    Jobs/               ← Hangfire background jobs
+    Hubs/               ← SignalR PresenceHub
+  PersonalSite.Api/
+    Controllers/        ← Public endpoints
+    Controllers/Admin/  ← Owner-only endpoints
+    Middleware/         ← Rate limiting, auth, logging
+    Program.cs
+  PersonalSite.Tests/
+    Domain.Tests/
+    Application.Tests/
+    Integration.Tests/
 ```
 
 ### 5.2 Full Endpoint Inventory
@@ -604,6 +684,7 @@ DELETE /api/newsletter/unsubscribe     — remove subscriber
 | POST | `/api/newsletter/subscribe` | None | Start subscription |
 | GET | `/api/newsletter/confirm` | Token (query) | Confirm opt-in |
 | POST | `/api/subscriber/verify` | Bearer | Validate subscriber token |
+| GET | `/api/musings/{slug}/body` | Bearer (subscriber) | Fetch subscriber-gated post body |
 | DELETE | `/api/newsletter/unsubscribe` | Bearer | Unsubscribe |
 | GET | `/api/admin/visitors` | Owner | Active visitor list |
 | GET | `/api/admin/contacts` | Owner | Contact form inbox |
@@ -633,7 +714,7 @@ All tools must be installed on Windows. Recommended installation via `winget`:
 ```powershell
 # Runtime & SDK
 winget install OpenJS.NodeJS.LTS        # Node.js LTS (Astro, Strapi)
-winget install Microsoft.DotNet.SDK.8   # .NET 8 SDK
+winget install Microsoft.DotNet.SDK.10  # .NET 10 SDK
 winget install Microsoft.AzureCLI       # Azure CLI
 
 # Dev tools
@@ -772,7 +853,7 @@ az webapp create `
   --name "$AppName-api" `
   --plan "$AppName-plan" `
   --resource-group $ResourceGroup `
-  --runtime "DOTNETCORE:8.0"
+  --runtime "DOTNETCORE:10.0"
 
 # 4. Strapi CMS — App Service
 az webapp create `
@@ -939,7 +1020,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
-        with: { dotnet-version: '8.0.x' }
+        with: { dotnet-version: '10.0.x' }
       - run: dotnet restore src/api/PersonalSite.sln
       - run: dotnet build src/api/PersonalSite.sln --no-restore -c Release
       - run: dotnet test src/api/PersonalSite.sln --no-build -c Release

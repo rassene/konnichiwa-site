@@ -205,8 +205,10 @@ export interface IContentAdapter {
 
 ## Part 2: .NET API — Domain Entities (Azure SQL / EF Core)
 
-Defined in `PersonalSite.Domain/` and mapped via EF Core in
-`PersonalSite.Infrastructure/`.
+Architecture: **Clean Architecture**. Entities live in `PersonalSite.Domain/Entities/`
+(no framework dependencies). EF Core mappings and `ApplicationDbContext` live in
+`PersonalSite.Infrastructure/Persistence/`. Use cases and service interfaces live in
+`PersonalSite.Application/`.
 
 ### Visitor
 
@@ -218,7 +220,6 @@ Visitor {
   LastSeenAt    DateTime     NOT NULL
   VisitCount    int          NOT NULL DEFAULT 1
   CountryCode   string(2)    NULL             -- ISO 3166-1 alpha-2, from IP geo
-  ConsentGiven  bool         NOT NULL DEFAULT false
   DataPurgeAt   DateTime     NOT NULL         -- FirstSeenAt + 12 months
 }
 ```
@@ -312,8 +313,8 @@ OwnerSession {
 
 ## Part 3: EF Core Migrations Strategy
 
-- All migrations live in `PersonalSite.Infrastructure/Migrations/`.
-- `dotnet ef migrations add <Name>` from `PersonalSite.Infrastructure/`.
+- All migrations live in `PersonalSite.Infrastructure/Persistence/Migrations/`.
+- `dotnet ef migrations add <Name> --project PersonalSite.Infrastructure --startup-project PersonalSite.Api`
 - Initial migration: `InitialCreate` — creates all tables above.
 - Hangfire tables created automatically by `UseSqlServerStorage()` on first run.
 - Schema: default (`dbo`). No multi-schema setup needed at this scale.

@@ -4,7 +4,7 @@ Auto-generated from all feature plans. Last updated: 2026-04-04
 
 ## Active Technologies
 
-- TypeScript (Astro 4.x + React 18), C# (.NET 8), TypeScript (Strapi v4) + Astro 4, React 18, ASP.NET Core 8, Entity Framework Core 8, (main)
+- TypeScript (Astro 4.x + React 18), C# (.NET 10), TypeScript (Strapi v4) + Astro 4, React 18, ASP.NET Core 10, Entity Framework Core 10, (main)
 
 ## Project Structure
 
@@ -20,11 +20,11 @@ npm test; npm run lint
 
 ## Code Style
 
-TypeScript (Astro 4.x + React 18), C# (.NET 8), TypeScript (Strapi v4): Follow standard conventions
+TypeScript (Astro 4.x + React 18), C# (.NET 10), TypeScript (Strapi v4): Follow standard conventions
 
 ## Recent Changes
 
-- main: Added TypeScript (Astro 4.x + React 18), C# (.NET 8), TypeScript (Strapi v4) + Astro 4, React 18, ASP.NET Core 8, Entity Framework Core 8,
+- main: Added TypeScript (Astro 4.x + React 18), C# (.NET 10), TypeScript (Strapi v4) + Astro 4, React 18, ASP.NET Core 10, Entity Framework Core 10,
 
 <!-- MANUAL ADDITIONS START -->
 ## Real Project Structure
@@ -32,7 +32,7 @@ TypeScript (Astro 4.x + React 18), C# (.NET 8), TypeScript (Strapi v4): Follow s
 ```text
 src/site/        ← Astro 4 public site (npm run dev → localhost:4321)
 src/admin/       ← Admin PWA React SPA (npm run dev → localhost:5173)
-src/api/         ← .NET 8 solution (dotnet run → localhost:5000)
+src/api/         ← .NET 10 solution, Clean Architecture (dotnet run → localhost:5000)
   PersonalSite.Api/
   PersonalSite.Application/
   PersonalSite.Domain/
@@ -50,6 +50,8 @@ specs/main/      ← project spec, plan, data model, contracts, quickstart
 - Shell sections and Immersive sections (Life Map, Meet the Family) are separate visual
   registers — do not mix their styles or motion patterns.
 - All scripts must be PowerShell (.ps1). No bash scripts, no WSL.
+- .NET API follows Clean Architecture: Domain ← Application ← Infrastructure ← Api.
+  Controllers contain NO business logic — they dispatch to Application use cases only.
 - Line endings: CRLF throughout. `"files.eol": "\r\n"` in VS Code settings.
 - JS bundle per shell route: ≤ 50 KB gzipped (Astro zero-JS baseline).
 - Every hydrated React island must justify its JS cost in a comment.

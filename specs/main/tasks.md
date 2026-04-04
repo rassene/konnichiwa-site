@@ -48,9 +48,10 @@ No Azure provisioning yet — local dev only.
   TypeScript strict mode; remove default template content
 - [ ] T006 [P] Scaffold React SPA (Vite) at `src/admin/` using `npm create vite@latest` with
   React + TypeScript template
-- [ ] T007 [P] Scaffold .NET 8 solution at `src/api/` with four projects: `PersonalSite.Api`,
-  `PersonalSite.Application`, `PersonalSite.Domain`, `PersonalSite.Infrastructure` + solution
-  file `PersonalSite.sln`
+- [ ] T007 [P] Scaffold .NET 10 solution at `src/api/` following Clean Architecture: create
+  four projects — `PersonalSite.Domain` (no deps), `PersonalSite.Application` (→ Domain),
+  `PersonalSite.Infrastructure` (→ Application + Domain), `PersonalSite.Api` (→ all) —
+  with project references enforcing the dependency rule; add `PersonalSite.sln`
 - [ ] T008 [P] Scaffold Strapi v4 project at `cms/` using `npx create-strapi-app@latest` with
   TypeScript + SQLite database
 - [ ] T009 Create `docker-compose.yml` at repo root with SQL Server 2022 (port 1433) and
@@ -77,12 +78,16 @@ section implementation can begin.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T013 Add NuGet package references to `src/api/PersonalSite.sln`:
-  `Microsoft.EntityFrameworkCore.SqlServer`, `Microsoft.EntityFrameworkCore.Design`,
-  `Hangfire.SqlServer`, `Hangfire.AspNetCore`, `Microsoft.AspNetCore.SignalR.Client`,
-  `Azure.Communication.Email`, `WebPush`, `Microsoft.IdentityModel.Tokens`
-- [ ] T014 [P] Set up project references in `.csproj` files:
-  `Api → Application → Domain`, `Infrastructure → Application`, `Api → Infrastructure`
+- [ ] T013 Add NuGet package references per Clean Architecture layer:
+  - `PersonalSite.Infrastructure`: `Microsoft.EntityFrameworkCore.SqlServer`,
+    `Microsoft.EntityFrameworkCore.Design`, `Hangfire.SqlServer`, `Hangfire.AspNetCore`,
+    `Azure.Communication.Email`, `WebPush`
+  - `PersonalSite.Application`: `Microsoft.IdentityModel.Tokens`, `FluentValidation`
+  - `PersonalSite.Api`: `Microsoft.AspNetCore.Authentication.JwtBearer`,
+    `Microsoft.AspNetCore.SignalR`, `Swashbuckle.AspNetCore`
+- [ ] T014 [P] Verify `.csproj` project references enforce Clean Architecture dependency rule:
+  Domain has no refs; Application → Domain only; Infrastructure → Application + Domain;
+  Api → all three; confirm with `dotnet build` (0 errors)
 - [ ] T015 Create global design tokens at `src/site/src/design/tokens.ts` with all color,
   font, space, radius, motion, and breakpoint values from spec §1.1
 - [ ] T016 [P] Create global CSS at `src/site/src/design/global.css` importing self-hosted
@@ -96,7 +101,9 @@ section implementation can begin.
 - [ ] T019 Create `IContentAdapter` interface at
   `src/site/src/content/adapters/IContentAdapter.ts` per data-model.md
 - [ ] T020 Create Strapi adapter stub at `src/site/src/content/adapters/strapi/index.ts`
-  implementing `IContentAdapter` — all methods return empty arrays / null initially
+  implementing `IContentAdapter` — all methods return empty arrays / null initially;
+  production adapter MUST propagate fetch errors (never swallow — build must fail if
+  Strapi is unreachable)
 - [ ] T021 Create CAL entry point at `src/site/src/content/index.ts` exporting
   `strapiAdapter as content` (single-line CMS switch point)
 - [ ] T022 Configure `@strapi/provider-upload-azure-storage` in `cms/config/plugins.ts`
@@ -111,10 +118,13 @@ section implementation can begin.
   `<ErrorBoundary>` at `src/site/src/components/` using design tokens
 - [ ] T027 Create Astro layout `src/site/src/layouts/BaseLayout.astro` composing NavBar +
   slot + Footer; applies global.css; includes `<meta>` tags for SEO
-- [ ] T028 Set up EF Core `ApplicationDbContext` in `PersonalSite.Infrastructure` with
-  `DbSet` for all entities in data-model.md Part 2; configure Azure SQL connection string
+- [ ] T028 Set up EF Core `ApplicationDbContext` in
+  `PersonalSite.Infrastructure/Persistence/ApplicationDbContext.cs` with `DbSet` for all
+  entities in data-model.md Part 2; configure Azure SQL connection string via options
+  injected from `PersonalSite.Api/Program.cs` (Infrastructure has no direct config access)
 - [ ] T029 Create initial EF Core migration `InitialCreate` in
-  `PersonalSite.Infrastructure/Migrations/` creating all tables from data-model.md
+  `PersonalSite.Infrastructure/Persistence/Migrations/` — run:
+  `dotnet ef migrations add InitialCreate --project PersonalSite.Infrastructure --startup-project PersonalSite.Api`
 - [ ] T030 Configure Hangfire in `PersonalSite.Api/Program.cs` with
   `UseSqlServerStorage()` pointing to same connection string as EF Core
 
@@ -247,13 +257,17 @@ Lighthouse Performance ≥ 90 on mobile.
   Swagger (development only)
 - [ ] T069 [P] [US1] Create `ContactSubmission` entity in `PersonalSite.Domain/Entities/`
   with fields from data-model.md; add `DbSet<ContactSubmission>` to `ApplicationDbContext`
-- [ ] T070 [P] [US1] Create `ContactFormRequest` and `ContactFormResponse` DTOs in
-  `PersonalSite.Application/DTOs/`
-- [ ] T071 [US1] Implement `ContactController` (or minimal API endpoint) in
-  `PersonalSite.Api/Controllers/ContactController.cs`: validate request, check honeypot,
-  enforce rate limit (3/IP/hour), save to DB, dispatch email via Azure Communication Services
-- [ ] T072 [US1] Implement `EmailService` in `PersonalSite.Infrastructure/Services/EmailService.cs`
-  using `Azure.Communication.Email` SDK; sends owner notification email on contact submission
+  in `PersonalSite.Infrastructure/Persistence/`
+- [ ] T070 [P] [US1] Create `SubmitContactFormCommand` + `SubmitContactFormHandler` in
+  `PersonalSite.Application/UseCases/Contact/`; define `IEmailService` interface in
+  `PersonalSite.Application/Interfaces/`; handler validates, saves via repository, calls
+  `IEmailService`
+- [ ] T071 [US1] Implement `ContactController` in `PersonalSite.Api/Controllers/` —
+  receives request, enforces rate limit (3/IP/hour via middleware), checks honeypot,
+  dispatches `SubmitContactFormCommand` via MediatR (or direct handler injection)
+- [ ] T072 [US1] Implement `EmailService : IEmailService` in
+  `PersonalSite.Infrastructure/Services/` using `Azure.Communication.Email` SDK; registered
+  in DI from `PersonalSite.Api/Program.cs`
 - [ ] T073 [US1] Create `infra/setup.ps1` skeleton with Resource Group, App Service Plan
   (B1 Linux, shared), .NET API App Service, Strapi App Service — idempotent pattern per
   spec §7.1; commit with parameters documented in `infra/parameters.example.ps1`
@@ -284,29 +298,28 @@ content in Musings and Readings. Owner can manage subscribers in Admin PWA (basi
 
 ### Subscriber Domain & API
 
-- [ ] T078 [P] [US2] Create domain entities in `PersonalSite.Domain/Entities/`:
-  `Subscriber`, `SubscriberCluster`, `PendingSubscription` per data-model.md; add
-  `DbSet` entries to `ApplicationDbContext`
-- [ ] T079 [US2] Add EF Core migration `AddSubscriberEntities` in
-  `PersonalSite.Infrastructure/Migrations/`
-- [ ] T080 [P] [US2] Create DTOs in `PersonalSite.Application/DTOs/`: `SubscribeRequest`,
-  `SubscribeResponse`, `ConfirmSubscriptionResponse`, `VerifyTokenRequest`,
-  `VerifyTokenResponse`
-- [ ] T081 [US2] Implement `SubscriptionService` in
-  `PersonalSite.Infrastructure/Services/SubscriptionService.cs`:
-  - `InitiateSubscription()` — create `PendingSubscription`, send double opt-in email
-  - `ConfirmSubscription()` — validate token, create `Subscriber` + `SubscriberCluster`
-    records, issue JWT access token
-  - `VerifyToken()` — validate JWT, return clusters
-  - `Unsubscribe()` — soft delete (set `Active = false`)
-- [ ] T082 [US2] Implement subscription API endpoints in
-  `PersonalSite.Api/Controllers/NewsletterController.cs`:
-  `POST /api/newsletter/subscribe`, `GET /api/newsletter/confirm`,
-  `POST /api/subscriber/verify`, `DELETE /api/newsletter/unsubscribe` per
-  `contracts/api.md`
-- [ ] T083 [US2] Implement JWT token issuance in `PersonalSite.Infrastructure/Services/TokenService.cs`
-  — subscriber token (30-day, `role: subscriber`, `clusters: [...]` claims) and owner
-  token (15-min, `role: owner`) using `Microsoft.IdentityModel.Tokens`
+- [ ] T078 [P] [US2] Create domain entities `Subscriber`, `SubscriberCluster`,
+  `PendingSubscription` in `PersonalSite.Domain/Entities/` per data-model.md; add `DbSet`
+  entries to `ApplicationDbContext` in `PersonalSite.Infrastructure/Persistence/`
+- [ ] T079 [US2] Add EF Core migration `AddSubscriberEntities` —
+  `dotnet ef migrations add AddSubscriberEntities --project PersonalSite.Infrastructure --startup-project PersonalSite.Api`
+- [ ] T080 [P] [US2] Define `ISubscriptionService` and `ITokenService` interfaces in
+  `PersonalSite.Application/Interfaces/`; create use case commands/queries in
+  `PersonalSite.Application/UseCases/Subscription/` (InitiateSubscription, ConfirmSubscription,
+  VerifyToken, Unsubscribe — each as a command/handler pair)
+- [ ] T081 [US2] Implement `SubscriptionService : ISubscriptionService` in
+  `PersonalSite.Infrastructure/Services/` — orchestrates domain logic: creates
+  `PendingSubscription`, triggers `IEmailService`, issues token via `ITokenService`; sliding-
+  window renewal: if token has ≤7 days remaining, `VerifyToken` issues and returns a fresh
+  30-day token in `newToken` response field
+- [ ] T082 [US2] Implement subscription endpoints in
+  `PersonalSite.Api/Controllers/NewsletterController.cs`: `POST /api/newsletter/subscribe`,
+  `GET /api/newsletter/confirm`, `POST /api/subscriber/verify`,
+  `DELETE /api/newsletter/unsubscribe` per `contracts/api.md`; controllers call Application
+  use cases only — no business logic in controllers
+- [ ] T083 [US2] Implement `TokenService : ITokenService` in
+  `PersonalSite.Infrastructure/Services/` — subscriber token (30-day, `role: subscriber`,
+  `clusters: [...]`), owner token (15-min, `role: owner`) using `Microsoft.IdentityModel.Tokens`
 
 ### Frontend: Subscriber Gate Integration
 
@@ -439,20 +452,13 @@ dispatch.
   visitor by fingerprint, increment visit count, set `DataPurgeAt = now + 12 months`
 - [ ] T112 [US4] Implement `POST /api/visitor/identify` in
   `PersonalSite.Api/Controllers/VisitorController.cs` per `contracts/api.md`;
-  check `X-Consent-Given` header; enforce GDPR (451 for EU IPs without consent)
+  upsert visitor record, return `{ returning, visitCount }`
 - [ ] T113 [US4] Add `fingerprintjs/fingerprintjs` to `src/site/` dependencies; create
-  `src/site/src/services/fingerprint.ts` — initializes FingerprintJS OSS, gets visitor ID,
-  checks localStorage for consent flag, POSTs to `/api/visitor/identify` if consent given;
-  exports `{ returning, visitCount }` result
+  `src/site/src/services/fingerprint.ts` — initializes FingerprintJS OSS on page load, gets
+  visitor ID, POSTs to `/api/visitor/identify`; exports `{ returning, visitCount }` result
 - [ ] T114 [US4] Update `src/site/src/sections/home/HeroBlock.astro` — hydrate a React
-  island that calls `fingerprint.ts` after consent; if `returning === true`, render subtle
+  island that calls `fingerprint.ts` on load; if `returning === true`, render subtle
   "Welcome back" personalization text
-
-### GDPR Consent Banner
-
-- [ ] T115 [US4] Create `src/site/src/components/ConsentBanner.tsx` — React island; shown
-  on first visit; "Accept" stores `consent=true` in localStorage and triggers fingerprinting;
-  "Decline" stores `consent=false`; banner does not reappear after choice
 
 ### SignalR: Real-Time Presence
 
