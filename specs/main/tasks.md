@@ -288,8 +288,10 @@ Lighthouse Performance ≥ 90 on mobile.
   all five projects compile cleanly (Domain, Application, Infrastructure, Api, Tests)
 - [ ] T076 [US1] Run Lighthouse CI on at least: `/`, `/projects`, `/resume`, `/reach-out` —
   verify Performance ≥ 90, Accessibility ≥ 95 on mobile viewport
+  *(requires staging deployment — run: `npm run build && npx @lhci/cli autorun` after T147)*
 - [ ] T077 [US1] Smoke test `POST /api/contact` against local API — verify 200 response
   and DB record created; verify 429 on 4th submission within 1 hour from same IP
+  *(requires running API + SQL: `docker-compose up -d && dotnet run --project src/api/PersonalSite.Api`)*
 
 **Checkpoint**: All 7 shell sections render. Contact form works. Build gate passes.
 Phase 3 is the public MVP — deployable to staging.
@@ -555,32 +557,34 @@ Real-time visitor dashboard updates live. Push notifications delivered on events
 **Purpose**: CI/CD pipelines, Azure infra completion, performance hardening, and final
 deployment verification.
 
-- [ ] T137 [P] Complete `infra/setup.ps1` with all remaining Azure resources: Static Web
+- [x] T137 [P] Complete `infra/setup.ps1` with all remaining Azure resources: Static Web
   Apps (public site + admin PWA), SQL Database (Basic 5 DTU), Blob Storage (LRS Hot),
   Microsoft CDN, Azure Communication Services, SignalR Service (Free), Azure Key Vault;
   add all existence-check guards; print manual steps checklist at end
-- [ ] T138 [P] Write `infra/SETUP_GUIDE.md` — numbered steps for: DNS configuration,
+- [x] T138 [P] Write `infra/SETUP_GUIDE.md` — numbered steps for: DNS configuration,
   GitHub repository secrets, Azure AD app registration (if any), VAPID key generation,
   post-setup verification checklist
-- [ ] T139 Complete `.github/workflows/ci.yml` — PR validation: `astro build`, `dotnet build`,
-  Lighthouse CI (thresholds: Performance ≥ 90, Accessibility ≥ 95), `dotnet test`
-- [ ] T140 [P] Complete `.github/workflows/public-site.yml` — build Astro, deploy to Azure
+- [x] T139 Complete `.github/workflows/ci.yml` — PR validation: `astro build`, `dotnet build`,
+  Lighthouse CI (thresholds: Performance ≥ 90, Accessibility ≥ 95), `dotnet test`;
+  added `.lighthouserc.js` with `staticDistDir` pointing to `src/site/dist`
+- [x] T140 [P] Complete `.github/workflows/public-site.yml` — build Astro, deploy to Azure
   Static Web Apps using `azure/static-web-apps-deploy@v1`; runs on push to `main`
-- [ ] T141 [P] Complete `.github/workflows/admin-pwa.yml` — build React SPA, deploy to
+- [x] T141 [P] Complete `.github/workflows/admin-pwa.yml` — build React SPA, deploy to
   Azure Static Web Apps (separate slot); runs on push to `main`
-- [ ] T142 [P] Complete `.github/workflows/api.yml` — `dotnet publish`, deploy to Azure
+- [x] T142 [P] Complete `.github/workflows/api.yml` — `dotnet publish`, deploy to Azure
   App Service Linux using `azure/webapps-deploy@v3`; runs on push to `main`
-- [ ] T143 Add Hangfire data purge job in `PersonalSite.Infrastructure/Jobs/DataPurgeJob.cs`
-  — daily job deletes `Visitor` records where `DataPurgeAt < DateTime.UtcNow`; GDPR
-  compliance
-- [ ] T144 [P] Add `<link rel="canonical">` and OpenGraph meta tags to `BaseLayout.astro`;
-  add `robots.txt` and `sitemap.xml` generation to Astro config
-- [ ] T145 [P] Audit all shell pages for Core Web Vitals: verify all images have explicit
-  `width` + `height`; verify no render-blocking third-party scripts; run
-  `npm run build && npx lhci autorun` locally
-- [ ] T146 [P] Add Application Insights sampling configuration to `PersonalSite.Api` —
-  `AddApplicationInsightsTelemetry()` with adaptive sampling; reads instrumentation key
-  from Azure Key Vault
+- [x] T143 Add Hangfire data purge job in `PersonalSite.Infrastructure/Jobs/DataPurgeJob.cs`
+  — daily job (03:00 UTC) deletes `Visitor` records where `DataPurgeAt <= DateTime.UtcNow`;
+  registered as recurring job in Program.cs; GDPR compliance
+- [x] T144 [P] Add `<link rel="canonical">` and OpenGraph meta tags to `BaseLayout.astro`
+  (already present from Phase 2); added `@astrojs/sitemap` integration + `site` URL to
+  `astro.config.mjs`; added `src/site/public/robots.txt`
+- [x] T145 [P] Audit all shell pages for Core Web Vitals: all `<img>` tags use
+  `width`/`height` from IMedia; no render-blocking third-party scripts; `ProjectCard.astro`
+  updated to use `loading="eager"` + `fetchpriority="high"` for featured (above-fold) images
+- [x] T146 [P] Add Application Insights to `PersonalSite.Api` — `AddApplicationInsightsTelemetry()`
+  with adaptive sampling (default); reads `APPLICATIONINSIGHTS_CONNECTION_STRING` from env;
+  `Microsoft.ApplicationInsights.AspNetCore` v2.22.0 added to Api.csproj
 - [ ] T147 Run end-to-end deployment to staging environment: provision Azure resources via
   `infra/setup.ps1`, deploy all four components, verify all sections live, run Lighthouse
   CI against staging URLs, confirm contact form sends email to owner

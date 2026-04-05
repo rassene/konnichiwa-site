@@ -1,9 +1,22 @@
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react()],
+  // Production domain — required for canonical URLs and sitemap absolute URLs.
+  // Override via PUBLIC_SITE_URL env var in CI / production deployments.
+  site: process.env.PUBLIC_SITE_URL ?? "https://localhost:4321",
+  integrations: [
+    react(),
+    sitemap({
+      // Exclude admin-adjacent and noindex routes from the public sitemap.
+      filter: (page) =>
+        !page.includes("/admin") &&
+        !page.includes("/api/") &&
+        !page.includes("/hangfire"),
+    }),
+  ],
   output: "static",
   // SSR mode activated per-page only where auth/personalization is required
   // (see spec §5.1 — musing post body fetched client-side via API)

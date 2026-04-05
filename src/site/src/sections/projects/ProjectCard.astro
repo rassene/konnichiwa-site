@@ -21,7 +21,8 @@ const coverImage = project.media?.[0];
         alt={coverImage.alt}
         width={coverImage.width}
         height={coverImage.height}
-        loading="lazy"
+        loading={featured ? 'eager' : 'lazy'}
+        fetchpriority={featured ? 'high' : 'auto'}
         decoding="async"
       />
     </div>

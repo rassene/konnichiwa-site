@@ -10,6 +10,7 @@ using PersonalSite.Api.Services;
 using PersonalSite.Application.Interfaces;
 using PersonalSite.Application.UseCases.Contact;
 using PersonalSite.Application.UseCases.Subscription;
+using Hangfire.Common;
 using PersonalSite.Infrastructure.Jobs;
 using PersonalSite.Infrastructure.Persistence;
 using PersonalSite.Infrastructure.Repositories;
@@ -18,6 +19,12 @@ using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ─── Application Insights ────────────────────────────────────────────────────
+// Reads APPLICATIONINSIGHTS_CONNECTION_STRING from env / App Service config.
+// Adaptive sampling is on by default — no custom configuration needed.
+// No-ops silently when the connection string is absent (local dev).
+builder.Services.AddApplicationInsightsTelemetry();
 
 // ─── Database ────────────────────────────────────────────────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -120,8 +127,9 @@ builder.Services.AddHostedService<PresencePruneService>();
 builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
 builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
 
-// Newsletter dispatch job (registered for DI by Hangfire)
+// Hangfire jobs (registered for DI)
 builder.Services.AddScoped<NewsletterDispatchJob>();
+builder.Services.AddScoped<DataPurgeJob>();
 
 // Azure Communication Services — email
 var acsConnectionString = builder.Configuration["Acs:ConnectionString"];
@@ -173,6 +181,14 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 
 app.MapControllers();
 app.MapHub<PresenceHub>("/hubs/presence");
+
+// ─── Recurring Hangfire jobs ──────────────────────────────────────────────────
+// GDPR data purge: runs daily at 03:00 UTC.
+RecurringJob.AddOrUpdate<DataPurgeJob>(
+    recurringJobId: "gdpr-data-purge",
+    methodCall:     job => job.ExecuteAsync(CancellationToken.None),
+    cronExpression: "0 3 * * *",
+    options:        new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
 
 app.Run();
 
