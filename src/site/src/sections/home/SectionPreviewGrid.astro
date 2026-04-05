@@ -1,6 +1,7 @@
 ---
 // Shell layer — grid of section preview cards linking to all main sections.
 // No JS required. Cards tease each section's visual language.
+// Life Map and Family cards carry immersive: true to signal their distinct visual register.
 
 const SECTIONS = [
   {
@@ -8,21 +9,24 @@ const SECTIONS = [
     title: 'Projects',
     description: 'Things I build — ideas, work-in-progress, and shipped.',
     accent: 'var(--color-accent)',
-    icon: '⚙',
+    icon: '◈',
+    immersive: false,
   },
   {
     href: '/life-map',
     title: 'Life Map',
-    description: 'An interactive timeline of milestones, big and small.',
-    accent: '#1A1A18',
+    description: 'A dark, interactive timeline of milestones — past, present, and future.',
+    accent: '#a0c4e8',
     icon: '◎',
+    immersive: true,
   },
   {
     href: '/family',
     title: 'Meet the Family',
-    description: 'The people who make me who I am.',
+    description: 'The people who make me who I am — a warm, playful scene.',
     accent: '#E8A87C',
     icon: '♡',
+    immersive: true,
   },
   {
     href: '/readings',
@@ -30,6 +34,7 @@ const SECTIONS = [
     description: 'Books, articles, papers — everything I\'ve been reading.',
     accent: '#9B59B6',
     icon: '◻',
+    immersive: false,
   },
   {
     href: '/musings',
@@ -37,6 +42,7 @@ const SECTIONS = [
     description: 'Notes, essays, and half-formed ideas.',
     accent: '#4A90D9',
     icon: '✦',
+    immersive: false,
   },
   {
     href: '/resume',
@@ -44,6 +50,7 @@ const SECTIONS = [
     description: 'My professional background and experience.',
     accent: '#2ECC71',
     icon: '⊞',
+    immersive: false,
   },
   {
     href: '/reach-out',
@@ -51,6 +58,7 @@ const SECTIONS = [
     description: 'Say hello — I read every message.',
     accent: 'var(--color-accent)',
     icon: '✉',
+    immersive: false,
   },
   {
     href: '/links',
@@ -58,6 +66,7 @@ const SECTIONS = [
     description: 'A curated list of places to find me online.',
     accent: '#E67E22',
     icon: '→',
+    immersive: false,
   },
 ];
 ---
@@ -66,12 +75,19 @@ const SECTIONS = [
   <div class="preview-grid__inner">
     <h2 class="preview-grid__heading">Explore</h2>
     <ul class="preview-grid__list" role="list">
-      {SECTIONS.map(({ href, title, description, accent, icon }) => (
+      {SECTIONS.map(({ href, title, description, accent, icon, immersive }) => (
         <li>
-          <a href={href} class="preview-card" style={`--card-accent: ${accent}`}>
+          <a
+            href={href}
+            class={`preview-card${immersive ? ' preview-card--immersive' : ''}`}
+            style={`--card-accent: ${accent}`}
+          >
             <span class="preview-card__icon" aria-hidden="true">{icon}</span>
             <span class="preview-card__title">{title}</span>
             <span class="preview-card__desc">{description}</span>
+            {immersive && (
+              <span class="preview-card__immersive-badge" aria-label="Immersive section">✦ immersive</span>
+            )}
             <span class="preview-card__arrow" aria-hidden="true">→</span>
           </a>
         </li>
@@ -175,5 +191,34 @@ const SECTIONS = [
 
   .preview-card:hover .preview-card__arrow {
     transform: translateX(4px);
+  }
+
+  /* Immersive section cards — dark-tinted to hint at their distinct visual register */
+  .preview-card--immersive {
+    background-color: #151512;
+    border-color: rgba(255,255,255,0.08);
+    color: #f0ece4;
+  }
+
+  .preview-card--immersive .preview-card__title {
+    color: #f0ece4;
+  }
+
+  .preview-card--immersive .preview-card__desc {
+    color: rgba(240,236,228,0.55);
+  }
+
+  .preview-card--immersive:hover {
+    border-color: var(--card-accent);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+
+  .preview-card__immersive-badge {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--card-accent);
+    opacity: 0.7;
   }
 </style>

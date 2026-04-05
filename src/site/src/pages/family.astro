@@ -1,0 +1,85 @@
+---
+// Immersive layer — Meet the Family page. No BaseLayout: own visual register.
+// JS cost: ~10 KB (FamilyScene React island) — justified: interactive scene with
+// member selection state, keyboard navigation, swipe gestures, and animated card display.
+import FamilyScene from '../sections/family/FamilyScene.tsx';
+import { content } from '../content/index.js';
+import type { IFamilyMember } from '../content/interfaces/index.js';
+
+const members: IFamilyMember[] = await content.getFamilyMembers();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meet the Family — konnichiwa.</title>
+    <meta name="description" content="The people who make me who I am." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/design/global.css" />
+  </head>
+  <body data-layer="immersive" class="family-page">
+    <nav class="family-nav" aria-label="Site navigation">
+      <a href="/" class="family-nav__back" aria-label="Back to home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Home</span>
+      </a>
+      <span class="family-nav__title">Meet the Family</span>
+    </nav>
+
+    {/* React island: requires interactivity for selection state, keyboard nav, swipe, and animations. */}
+    <FamilyScene client:load members={members} />
+  </body>
+</html>
+
+<style is:global>
+  body.family-page {
+    margin: 0;
+    background-color: #1a0f0a;
+    color: #fdf4ec;
+    font-family: "DM Sans", system-ui, sans-serif;
+    min-height: 100svh;
+    overflow-x: hidden;
+  }
+
+  .family-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: linear-gradient(to bottom, rgba(26, 15, 10, 0.95) 0%, transparent 100%);
+  }
+
+  .family-nav__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(253, 244, 236, 0.7);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-family: "JetBrains Mono", monospace;
+    transition: color 200ms ease;
+  }
+
+  .family-nav__back:hover {
+    color: #fdf4ec;
+  }
+
+  .family-nav__title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(253, 244, 236, 0.5);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+</style>

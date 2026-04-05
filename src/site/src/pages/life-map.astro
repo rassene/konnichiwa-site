@@ -1,0 +1,85 @@
+---
+// Immersive layer — Life Map page. No BaseLayout: this section has its own visual register.
+// JS cost: ~12 KB (LifeMapCanvas React island) — justified: interactive timeline with
+// scroll-driven animation, category filter state, and dynamic milestone card display.
+import LifeMapCanvas from '../sections/life-map/LifeMapCanvas.tsx';
+import { content } from '../content/index.js';
+import type { IMilestone } from '../content/interfaces/index.js';
+
+const milestones: IMilestone[] = await content.getMilestones();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life Map — konnichiwa.</title>
+    <meta name="description" content="An interactive timeline of milestones, big and small." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/design/global.css" />
+  </head>
+  <body data-layer="immersive" class="life-map-page">
+    <nav class="life-map-nav" aria-label="Site navigation">
+      <a href="/" class="life-map-nav__back" aria-label="Back to home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Home</span>
+      </a>
+      <span class="life-map-nav__title">Life Map</span>
+    </nav>
+
+    {/* React island: requires interactivity for scroll state, filter state, and milestone card toggling. */}
+    <LifeMapCanvas client:load milestones={milestones} />
+  </body>
+</html>
+
+<style is:global>
+  body.life-map-page {
+    margin: 0;
+    background-color: #0f0f0e;
+    color: #f0ece4;
+    font-family: "DM Sans", system-ui, sans-serif;
+    min-height: 100svh;
+    overflow-x: hidden;
+  }
+
+  .life-map-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: linear-gradient(to bottom, rgba(15, 15, 14, 0.95) 0%, transparent 100%);
+  }
+
+  .life-map-nav__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(240, 236, 228, 0.7);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-family: "JetBrains Mono", monospace;
+    transition: color 200ms ease;
+  }
+
+  .life-map-nav__back:hover {
+    color: #f0ece4;
+  }
+
+  .life-map-nav__title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(240, 236, 228, 0.5);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+</style>

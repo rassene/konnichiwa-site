@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "family_members",
+  "info": {
+    "singularName": "family-member",
+    "pluralName": "family-members",
+    "displayName": "Family Member",
+    "description": "Family members for the Meet the Family immersive section"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "relation": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "tagline": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "funFacts": {
+      "type": "json"
+    },
+    "emoji": {
+      "type": "string",
+      "maxLength": 8
+    },
+    "order": {
+      "type": "integer",
+      "default": 0,
+      "required": true
+    }
+  }
+}

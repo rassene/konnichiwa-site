@@ -147,16 +147,52 @@ function mapMusing(item: Record<string, unknown>): IMusingPost {
 // ─── Adapter ────────────────────────────────────────────────────────────────
 
 export const strapiAdapter: IContentAdapter = {
-  // ─── Milestones (Phase 5 — T094) ─────────────────────────────────────────
+  // ─── Milestones (T094) ───────────────────────────────────────────────────
   async getMilestones(): Promise<IMilestone[]> {
-    // TODO (T094): implement when milestone Strapi type is created in Phase 5
-    return [];
+    const data = await strapiGet<{ data: unknown[] }>(
+      '/milestones?populate=media&sort=date:asc',
+    );
+    return (data.data ?? []).map((item) => {
+      const raw = item as Record<string, unknown>;
+      const attrs = (raw['attributes'] ?? raw) as Record<string, unknown>;
+      const mediaData = (attrs['media'] as Record<string, unknown> | undefined)?.['data'];
+      return {
+        id:          String(raw['id'] ?? ''),
+        date:        String(attrs['date'] ?? ''),
+        title:       String(attrs['title'] ?? ''),
+        description: String(attrs['description'] ?? ''),
+        category:    (attrs['category'] as IMilestone['category']) ?? 'personal',
+        media:       mapMediaArray(mediaData),
+        featured:    Boolean(attrs['featured']),
+      };
+    });
   },
 
-  // ─── Family Members (Phase 5 — T095) ────────────────────────────────────
+  // ─── Family Members (T095) ───────────────────────────────────────────────
   async getFamilyMembers(): Promise<IFamilyMember[]> {
-    // TODO (T095): implement when family-member Strapi type is created in Phase 5
-    return [];
+    const data = await strapiGet<{ data: unknown[] }>(
+      '/family-members?populate=photo&sort=order:asc',
+    );
+    return (data.data ?? []).map((item) => {
+      const raw = item as Record<string, unknown>;
+      const attrs = (raw['attributes'] ?? raw) as Record<string, unknown>;
+      const photoData = (attrs['photo'] as Record<string, unknown> | undefined)?.['data'] as
+        | Record<string, unknown>
+        | null;
+      const photoAttrs = photoData?.['attributes'] as Record<string, unknown> | undefined;
+      return {
+        id:       String(raw['id'] ?? ''),
+        name:     String(attrs['name'] ?? ''),
+        relation: String(attrs['relation'] ?? ''),
+        tagline:  String(attrs['tagline'] ?? ''),
+        photo:    photoAttrs
+          ? (mapMedia(photoAttrs) ?? { url: '', alt: attrs['name'] ? String(attrs['name']) : '' })
+          : { url: '', alt: attrs['name'] ? String(attrs['name']) : '' },
+        funFacts: Array.isArray(attrs['funFacts']) ? (attrs['funFacts'] as string[]) : [],
+        emoji:    attrs['emoji'] ? String(attrs['emoji']) : undefined,
+        order:    typeof attrs['order'] === 'number' ? attrs['order'] : 0,
+      };
+    });
   },
 
   // ─── Projects (T036) ─────────────────────────────────────────────────────

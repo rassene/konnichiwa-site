@@ -97,6 +97,102 @@
       "clusters": ["books-ideas"]
     }
   ],
+  "milestones": [
+    {
+      "date": "2016-09-01",
+      "title": "Started High School",
+      "description": "Enrolled in a science-track secondary school — the beginning of many late-night study sessions and lifelong friendships.",
+      "category": "academic",
+      "featured": false,
+      "order": 1
+    },
+    {
+      "date": "2019-06-15",
+      "title": "First Open Source Contribution",
+      "description": "Merged my first pull request into an open source project — a tiny docs fix that felt enormous at the time.",
+      "category": "professional",
+      "featured": false,
+      "order": 2
+    },
+    {
+      "date": "2020-09-01",
+      "title": "University — Computer Science",
+      "description": "Began a BSc in Computer Science. Chose software engineering as my specialisation after falling in love with system design.",
+      "category": "academic",
+      "featured": true,
+      "order": 3
+    },
+    {
+      "date": "2022-07-04",
+      "title": "First Engineering Internship",
+      "description": "Spent a summer building internal tooling at a tech company. Shipped my first feature to production and survived code review.",
+      "category": "professional",
+      "featured": true,
+      "order": 4
+    },
+    {
+      "date": "2023-03-20",
+      "title": "Built Something for Fun",
+      "description": "Stayed up all night building a small reading tracker app just because I wanted to. No deadline, no requirements — pure joy.",
+      "category": "creative",
+      "featured": false,
+      "order": 5
+    },
+    {
+      "date": "2024-06-01",
+      "title": "Graduated",
+      "description": "Walked across the stage with a BSc in Computer Science. Four years of coffee, compilers, and good people.",
+      "category": "academic",
+      "featured": true,
+      "order": 6
+    },
+    {
+      "date": "2027-01-01",
+      "title": "Something Big (TBD)",
+      "description": "Whatever comes next — still writing this chapter.",
+      "category": "future",
+      "featured": false,
+      "order": 7
+    }
+  ],
+  "family-members": [
+    {
+      "name": "Mum",
+      "relation": "Mum",
+      "tagline": "The person who somehow always knows when something is wrong before I do.",
+      "funFacts": [
+        "Makes the best mint tea in the world — no contest",
+        "Has read more books than anyone I know",
+        "Can navigate any city without a map"
+      ],
+      "emoji": "☕",
+      "order": 1
+    },
+    {
+      "name": "Dad",
+      "relation": "Dad",
+      "tagline": "Engineer by trade, storyteller by nature — where I get both the logic and the drama.",
+      "funFacts": [
+        "Built our first family computer from scratch",
+        "Has a story for every occasion",
+        "Still handwrites letters"
+      ],
+      "emoji": "🔧",
+      "order": 2
+    },
+    {
+      "name": "Little Sibling",
+      "relation": "Little Sibling",
+      "tagline": "Funnier than me, braver than me, and growing up way too fast.",
+      "funFacts": [
+        "Can recite entire movie scripts from memory",
+        "Beat me at chess at age nine",
+        "Has excellent taste in music (admitted reluctantly)"
+      ],
+      "emoji": "⭐",
+      "order": 3
+    }
+  ],
   "resume-data": {
     "downloadUrl": "https://placeholder.blob.core.windows.net/assets/resume.pdf",
     "education": [

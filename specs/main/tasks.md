@@ -375,67 +375,68 @@ Both sections pass Lighthouse AA accessibility for informational content.
 
 ### Strapi Content Types for Immersive Modules
 
-- [ ] T091 [P] [US3] Create Strapi collection type `milestone` in `cms/src/api/milestone/`
+- [x] T091 [P] [US3] Create Strapi collection type `milestone` in `cms/src/api/milestone/`
   with fields: date, title, description, category (enum including 'future'), media
   (relation), featured (bool), order (int)
-- [ ] T092 [P] [US3] Create Strapi collection type `family-member` in
+- [x] T092 [P] [US3] Create Strapi collection type `family-member` in
   `cms/src/api/family-member/` with fields: name, relation, tagline, photo (media), funFacts
   (JSON array), emoji, order (int)
-- [ ] T093 [US3] Seed Strapi with sample milestones (5+) and family members (3+) via admin
-  UI; include at least 1 featured milestone and 1 milestone with `category: 'future'`
+- [x] T093 [US3] Seed Strapi with sample milestones (5+) and family members (3+) via admin
+  UI; include at least 1 featured milestone and 1 milestone with `category: 'future'`; added
+  7 milestones (3 featured, 1 future) and 3 family members to `cms/scripts/seed-data.json`
 
 ### CAL Adapter: Immersive Data
 
-- [ ] T094 [P] [US3] Implement `getMilestones()` in the Strapi adapter at
+- [x] T094 [P] [US3] Implement `getMilestones()` in the Strapi adapter at
   `src/site/src/content/adapters/strapi/index.ts`; map to `IMilestone[]`; sort by date
-- [ ] T095 [P] [US3] Implement `getFamilyMembers()` in the Strapi adapter; map to
+- [x] T095 [P] [US3] Implement `getFamilyMembers()` in the Strapi adapter; map to
   `IFamilyMember[]`; sort by `order` field
 
 ### Life Map Section (Immersive)
 
-- [ ] T096 [US3] Create `src/site/src/pages/life-map.astro` — fetches `getMilestones()`
+- [x] T096 [US3] Create `src/site/src/pages/life-map.astro` — fetches `getMilestones()`
   via CAL; passes to `<LifeMapCanvas>` React island; no BaseLayout (immersive — own layout)
-- [ ] T097 [US3] Create `src/site/src/sections/life-map/LifeMapCanvas.tsx` — React island;
+- [x] T097 [US3] Create `src/site/src/sections/life-map/LifeMapCanvas.tsx` — React island;
   orchestrates scroll state; renders `<TimelinePath>` + array of `<MilestoneNode>`;
   implements category filter state; desktop: horizontal scroll; mobile: vertical scroll
-- [ ] T098 [P] [US3] Create `src/site/src/sections/life-map/TimelinePath.tsx` — SVG or
+- [x] T098 [P] [US3] Create `src/site/src/sections/life-map/TimelinePath.tsx` — SVG or
   CSS animated connector path between milestone nodes; animates on scroll using
   Intersection Observer; respects `prefers-reduced-motion`
-- [ ] T099 [P] [US3] Create `src/site/src/sections/life-map/MilestoneNode.tsx` — dot/icon
+- [x] T099 [P] [US3] Create `src/site/src/sections/life-map/MilestoneNode.tsx` — dot/icon
   on path; hover/tap reveals `<MilestoneCard>`; featured nodes are visually larger; future
   milestones have distinct visual indicator
-- [ ] T100 [P] [US3] Create `src/site/src/sections/life-map/MilestoneCard.tsx` — expanded
+- [x] T100 [P] [US3] Create `src/site/src/sections/life-map/MilestoneCard.tsx` — expanded
   detail card: title, date (mono font), description, media (if any); closes on outside click
   or Escape key
-- [ ] T101 [P] [US3] Create `src/site/src/sections/life-map/CategoryFilter.tsx` — pill
+- [x] T101 [P] [US3] Create `src/site/src/sections/life-map/CategoryFilter.tsx` — pill
   group filter by milestone category; updates LifeMapCanvas filter state
-- [ ] T102 [US3] Apply immersive visual language to Life Map: dark/saturated background
+- [x] T102 [US3] Apply immersive visual language to Life Map: dark/saturated background
   token, immersive motion tokens (`tokens.motion.immersive`), date labels in
   `tokens.font.mono`; add `data-layer="immersive"` attribute for CSS scoping
 
 ### Meet the Family Section (Immersive)
 
-- [ ] T103 [US3] Create `src/site/src/pages/family.astro` — fetches `getFamilyMembers()`
+- [x] T103 [US3] Create `src/site/src/pages/family.astro` — fetches `getFamilyMembers()`
   via CAL; passes to `<FamilyScene>` React island; no BaseLayout (immersive)
-- [ ] T104 [US3] Create `src/site/src/sections/family/FamilyScene.tsx` — React island;
+- [x] T104 [US3] Create `src/site/src/sections/family/FamilyScene.tsx` — React island;
   renders family members as positioned spots in a scene composition; manages selected
   member state; supports keyboard navigation
-- [ ] T105 [P] [US3] Create `src/site/src/sections/family/FamilyMemberSpot.tsx` — tappable/
+- [x] T105 [P] [US3] Create `src/site/src/sections/family/FamilyMemberSpot.tsx` — tappable/
   clickable character position; triggers member card display on activation; uses member's
   optional signature emoji overlay
-- [ ] T106 [P] [US3] Create `src/site/src/sections/family/FamilyMemberCard.tsx` — detail
+- [x] T106 [P] [US3] Create `src/site/src/sections/family/FamilyMemberCard.tsx` — detail
   panel: photo, name, relation, tagline, 2–3 fun facts; slide-in animation; ARIA role
   `dialog` for accessibility
-- [ ] T107 [P] [US3] Create `src/site/src/sections/family/FamilyNav.tsx` — prev/next
+- [x] T107 [P] [US3] Create `src/site/src/sections/family/FamilyNav.tsx` — prev/next
   navigation between family members; supports swipe gesture on mobile
-- [ ] T108 [US3] Apply immersive visual language to Family section: warm/playful token
+- [x] T108 [US3] Apply immersive visual language to Family section: warm/playful token
   palette distinct from shell and Life Map; `data-layer="immersive"` attribute
 
 ### Section Preview Grid Update
 
-- [ ] T109 [US3] Update `src/site/src/sections/home/SectionPreviewGrid.astro` — Life Map
+- [x] T109 [US3] Update `src/site/src/sections/home/SectionPreviewGrid.astro` — Life Map
   card previews dark timeline aesthetic; Family card previews playful style; cards link to
-  `/life-map` and `/family`
+  `/life-map` and `/family`; `immersive: true` flag adds dark-tinted card style and badge
 
 **Checkpoint**: Both immersive sections load and are interactive. Timeline path animates.
 Family scene is navigable. Lighthouse AA passes for informational content. Build gate passes.
