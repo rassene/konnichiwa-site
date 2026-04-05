@@ -16,4 +16,24 @@ public interface IEmailService
         string textBody,
         string htmlBody,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Send a double opt-in confirmation email to a prospective subscriber.
+    /// <paramref name="confirmUrl"/> is the full URL the subscriber must click to confirm.
+    /// </summary>
+    Task SendSubscriberConfirmationAsync(
+        string toEmail,
+        string confirmUrl,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Send an arbitrary email to a specific recipient.
+    /// Used by newsletter dispatch jobs to reach subscribers.
+    /// </summary>
+    Task SendToAsync(
+        string toEmail,
+        string subject,
+        string textBody,
+        string htmlBody,
+        CancellationToken cancellationToken = default);
 }

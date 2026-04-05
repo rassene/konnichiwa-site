@@ -56,7 +56,11 @@ const STARS = Array.from({ length: 5 }, (_, i) => i + 1);
 
   {reading.note && (
     <div class="reading-card__note">
-      <GatedNoteTeaser note={reading.note} isGated={reading.noteIsGated} />
+      <GatedNoteTeaser
+        note={reading.note}
+        isGated={reading.noteIsGated}
+        clusterSlugs={reading.clusters}
+      />
     </div>
   )}
 

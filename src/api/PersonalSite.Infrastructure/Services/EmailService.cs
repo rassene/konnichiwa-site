@@ -28,9 +28,43 @@ public sealed class EmailService : IEmailService
         string htmlBody,
         CancellationToken cancellationToken = default)
     {
+        await SendAsync(_ownerAddress, subject, textBody, htmlBody, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task SendSubscriberConfirmationAsync(
+        string toEmail,
+        string confirmUrl,
+        CancellationToken cancellationToken = default)
+    {
+        const string subject  = "Confirm your subscription";
+        var textBody = $"Click the link below to confirm your subscription:\n\n{confirmUrl}\n\nThis link expires in 24 hours.";
+        var htmlBody = $"<p>Click the link below to confirm your subscription:</p>" +
+                       $"<p><a href=\"{System.Net.WebUtility.HtmlEncode(confirmUrl)}\">Confirm subscription</a></p>" +
+                       $"<p>This link expires in 24 hours.</p>";
+
+        await SendAsync(toEmail, subject, textBody, htmlBody, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task SendToAsync(
+        string toEmail,
+        string subject,
+        string textBody,
+        string htmlBody,
+        CancellationToken cancellationToken = default)
+        => SendAsync(toEmail, subject, textBody, htmlBody, cancellationToken);
+
+    private async Task SendAsync(
+        string toAddress,
+        string subject,
+        string textBody,
+        string htmlBody,
+        CancellationToken cancellationToken)
+    {
         var message = new EmailMessage(
             senderAddress: _senderAddress,
-            recipients: new EmailRecipients([new EmailAddress(_ownerAddress)]),
+            recipients: new EmailRecipients([new EmailAddress(toAddress)]),
             content: new EmailContent(subject)
             {
                 PlainText = textBody,

@@ -306,55 +306,56 @@ content in Musings and Readings. Owner can manage subscribers in Admin PWA (basi
 
 ### Subscriber Domain & API
 
-- [ ] T078 [P] [US2] Create domain entities `Subscriber`, `SubscriberCluster`,
+- [x] T078 [P] [US2] Create domain entities `Subscriber`, `SubscriberCluster`,
   `PendingSubscription` in `PersonalSite.Domain/Entities/` per data-model.md; add `DbSet`
   entries to `ApplicationDbContext` in `PersonalSite.Infrastructure/Persistence/`
-- [ ] T079 [US2] Add EF Core migration `AddSubscriberEntities` —
-  `dotnet ef migrations add AddSubscriberEntities --project PersonalSite.Infrastructure --startup-project PersonalSite.Api`
-- [ ] T080 [P] [US2] Define `ISubscriptionService` and `ITokenService` interfaces in
-  `PersonalSite.Application/Interfaces/`; create use case commands/queries in
-  `PersonalSite.Application/UseCases/Subscription/` (InitiateSubscription, ConfirmSubscription,
-  VerifyToken, Unsubscribe — each as a command/handler pair)
-- [ ] T081 [US2] Implement `SubscriptionService : ISubscriptionService` in
+- [x] T079 [US2] Add EF Core migration `AddSubscriberEntities` — subscriber tables included
+  in `InitialCreate` migration (entities were already in DbContext when migration was generated)
+- [x] T080 [P] [US2] Define `ISubscriptionService`, `ITokenService`, `ISubscriberRepository`
+  interfaces in `PersonalSite.Application/Interfaces/`; created use case command/handler pairs
+  in `PersonalSite.Application/UseCases/Subscription/` (InitiateSubscription, ConfirmSubscription,
+  VerifyToken, Unsubscribe)
+- [x] T081 [US2] Implement `SubscriptionService : ISubscriptionService` in
   `PersonalSite.Infrastructure/Services/` — orchestrates domain logic: creates
   `PendingSubscription`, triggers `IEmailService`, issues token via `ITokenService`; sliding-
   window renewal: if token has ≤7 days remaining, `VerifyToken` issues and returns a fresh
   30-day token in `newToken` response field
-- [ ] T082 [US2] Implement subscription endpoints in
+- [x] T082 [US2] Implement subscription endpoints in
   `PersonalSite.Api/Controllers/NewsletterController.cs`: `POST /api/newsletter/subscribe`,
   `GET /api/newsletter/confirm`, `POST /api/subscriber/verify`,
   `DELETE /api/newsletter/unsubscribe` per `contracts/api.md`; controllers call Application
   use cases only — no business logic in controllers
-- [ ] T083 [US2] Implement `TokenService : ITokenService` in
+- [x] T083 [US2] Implement `TokenService : ITokenService` in
   `PersonalSite.Infrastructure/Services/` — subscriber token (30-day, `role: subscriber`,
   `clusters: [...]`), owner token (15-min, `role: owner`) using `Microsoft.IdentityModel.Tokens`
 
 ### Frontend: Subscriber Gate Integration
 
-- [ ] T084 [US2] Create `src/site/src/services/subscriber.ts` — client-side module that:
+- [x] T084 [US2] Create `src/site/src/services/subscriber.ts` — client-side module that:
   reads `sub_token` from localStorage, calls `POST /api/subscriber/verify`, caches result
   in sessionStorage; exported as `subscriberService`
-- [ ] T085 [US2] Update `src/site/src/sections/musings/MusingPostCard.astro` — pass
-  verified subscriber clusters to client; hydrate `<SubscriberGate>` as React island for
-  token verification on client
-- [ ] T086 [US2] Update `src/site/src/sections/readings/GatedNoteTeaser.astro` — same
-  pattern as musings gate; use `subscriberService` to verify token client-side
-- [ ] T087 [US2] Create `src/site/src/sections/home/NewsletterCTA.tsx` — upgrade from
-  Astro to React island (requires client interactivity for API call); full subscribe form
-  with cluster selection checkboxes; success/error states; stores received JWT in
-  localStorage
+- [x] T085 [US2] Update `src/site/src/sections/musings/MusingPostCard.astro` — created
+  `SubscriberGateIsland.tsx` React island; gated posts hydrate it (`client:load`) for
+  client-side token verification; shows post link when verified, lock CTA when not
+- [x] T086 [US2] Update `src/site/src/sections/readings/GatedNoteTeaser.astro` — created
+  `GatedNoteTeaserIsland.tsx` React island; gated notes hydrate it (`client:load`); reveals
+  full note when subscriber has cluster access, shows blurred teaser + CTA otherwise
+- [x] T087 [US2] Create `src/site/src/sections/home/NewsletterCTA.tsx` — React island
+  (replaces static Astro form); full subscribe form with cluster selection checkboxes;
+  success/error/conflict states; `index.astro` upgraded to fetch clusters via CAL and pass
+  as props
 
 ### Hangfire Newsletter Dispatch
 
-- [ ] T088 [US2] Create Strapi collection type `newsletter-dispatch` in
+- [x] T088 [US2] Create Strapi collection type `newsletter-dispatch` in
   `cms/src/api/newsletter-dispatch/` with fields: postSlug, clusters (relation), subject,
   status (enum: draft/sent), sentAt
-- [ ] T089 [US2] Implement `NewsletterDispatchJob` in
+- [x] T089 [US2] Implement `NewsletterDispatchJob` in
   `PersonalSite.Infrastructure/Jobs/NewsletterDispatchJob.cs` using Hangfire:
   - Query active subscribers by cluster slugs
   - Batch emails via `EmailService` (max 50 per batch)
   - Update dispatch record status on completion
-- [ ] T090 [US2] Implement `POST /api/admin/newsletter/dispatch` in
+- [x] T090 [US2] Implement `POST /api/admin/newsletter/dispatch` in
   `PersonalSite.Api/Controllers/AdminNewsletterController.cs` — enqueue Hangfire job;
   return 202 with job ID
 

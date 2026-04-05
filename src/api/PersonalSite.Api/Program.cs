@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PersonalSite.Application.Interfaces;
 using PersonalSite.Application.UseCases.Contact;
+using PersonalSite.Application.UseCases.Subscription;
+using PersonalSite.Infrastructure.Jobs;
 using PersonalSite.Infrastructure.Persistence;
 using PersonalSite.Infrastructure.Repositories;
 using PersonalSite.Infrastructure.Services;
@@ -99,6 +101,18 @@ builder.Services.AddRateLimiter(opts =>
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<SubmitContactFormHandler>();
 
+// Subscriber services
+builder.Services.AddScoped<ISubscriberRepository, SubscriberRepository>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddScoped<InitiateSubscriptionHandler>();
+builder.Services.AddScoped<ConfirmSubscriptionHandler>();
+builder.Services.AddScoped<VerifyTokenHandler>();
+builder.Services.AddScoped<UnsubscribeHandler>();
+
+// Newsletter dispatch job (registered for DI by Hangfire)
+builder.Services.AddScoped<NewsletterDispatchJob>();
+
 // Azure Communication Services — email
 var acsConnectionString = builder.Configuration["Acs:ConnectionString"];
 if (!string.IsNullOrWhiteSpace(acsConnectionString))
@@ -163,8 +177,25 @@ internal sealed class NoOpEmailService : IEmailService
         string subject, string textBody, string htmlBody,
         CancellationToken cancellationToken = default)
     {
-        Console.WriteLine($"[NoOpEmailService] Subject: {subject}");
-        Console.WriteLine($"[NoOpEmailService] Body: {textBody}");
+        Console.WriteLine($"[NoOpEmailService → owner] Subject: {subject}");
+        Console.WriteLine($"[NoOpEmailService → owner] Body: {textBody}");
+        return Task.CompletedTask;
+    }
+
+    public Task SendSubscriberConfirmationAsync(
+        string toEmail, string confirmUrl,
+        CancellationToken cancellationToken = default)
+    {
+        Console.WriteLine($"[NoOpEmailService → {toEmail}] Confirm subscription: {confirmUrl}");
+        return Task.CompletedTask;
+    }
+
+    public Task SendToAsync(
+        string toEmail, string subject, string textBody, string htmlBody,
+        CancellationToken cancellationToken = default)
+    {
+        Console.WriteLine($"[NoOpEmailService → {toEmail}] Subject: {subject}");
+        Console.WriteLine($"[NoOpEmailService → {toEmail}] Body: {textBody}");
         return Task.CompletedTask;
     }
 }

@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsletter_dispatches",
+  "info": {
+    "singularName": "newsletter-dispatch",
+    "pluralName": "newsletter-dispatches",
+    "displayName": "Newsletter Dispatch",
+    "description": "Newsletter dispatch records — one per musing post sent to subscribers"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "postSlug": {
+      "type": "string",
+      "required": true,
+      "description": "Slug of the musing-post this dispatch targets"
+    },
+    "clusters": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::interest-cluster.interest-cluster",
+      "description": "Interest clusters this dispatch was sent to"
+    },
+    "subject": {
+      "type": "string",
+      "required": true,
+      "maxLength": 300,
+      "description": "Email subject line"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["draft", "sent"],
+      "required": true,
+      "default": "draft"
+    },
+    "sentAt": {
+      "type": "datetime",
+      "description": "Timestamp when the dispatch job completed"
+    }
+  }
+}

@@ -1,8 +1,11 @@
 ---
-// Shell layer — musing post card, tier-aware. Zero JS.
-// Gated posts show excerpt + lock; public posts show full teaser.
+// Shell layer — musing post card, tier-aware.
+// Public posts: zero JS. Gated posts: hydrate SubscriberGateIsland (client:load) to
+// verify subscriber token and replace lock CTA with post link if access is confirmed.
+// JS cost for gated posts: ~3 KB (React island) — justified by T085 subscriber gate requirement.
 import type { IMusingPost, IInterestCluster } from '../../content/interfaces/index.js';
 import Tag from '../../components/Tag.astro';
+import SubscriberGateIsland from './SubscriberGateIsland.tsx';
 
 interface Props {
   post: IMusingPost;
@@ -51,9 +54,12 @@ const dateFormatted = new Date(post.publishedAt).toLocaleDateString('en-GB', {
   )}
 
   {isGated && (
-    <div class="musing-card__gated-cta">
-      <a href="/#subscribe" class="musing-card__subscribe">Subscribe to read →</a>
-    </div>
+    <SubscriberGateIsland
+      client:load
+      slug={post.slug}
+      requiredClusters={post.clusters}
+      title={post.title}
+    />
   )}
 
   {postClusters.length > 0 && (
@@ -139,6 +145,10 @@ const dateFormatted = new Date(post.publishedAt).toLocaleDateString('en-GB', {
     line-height: 1.6;
     margin: 0;
     flex: 1;
+  }
+
+  .musing-card__subscribe--loading {
+    opacity: 0.4;
   }
 
   .musing-card__read-more,

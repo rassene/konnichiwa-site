@@ -1,10 +1,15 @@
 ---
-// Home page — shell layer, T039.
+// Home page — shell layer, T039 / T087.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HeroBlock from '../sections/home/HeroBlock.astro';
 import IdentityStrip from '../sections/home/IdentityStrip.astro';
 import SectionPreviewGrid from '../sections/home/SectionPreviewGrid.astro';
-import NewsletterCTA from '../sections/home/NewsletterCTA.astro';
+import NewsletterCTA from '../sections/home/NewsletterCTA.tsx';
+import { content } from '../content/index.js';
+
+// Fetch clusters server-side at build time for the NewsletterCTA island props.
+const clusters = await content.getClusters();
+const clusterOptions = clusters.map((c) => ({ slug: c.slug, label: c.label, color: c.color }));
 ---
 
 <BaseLayout
@@ -14,5 +19,6 @@ import NewsletterCTA from '../sections/home/NewsletterCTA.astro';
   <HeroBlock />
   <IdentityStrip />
   <SectionPreviewGrid />
-  <NewsletterCTA />
+  {/* React island: requires interactivity for API call, cluster selection, and success/error state. */}
+  <NewsletterCTA client:load clusters={clusterOptions} />
 </BaseLayout>
