@@ -1,0 +1,20 @@
+.welcomeBack {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+  margin: 0;
+  animation: fadeIn var(--motion-base, 200ms) ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcomeBack {
+    animation: none;
+  }
+}

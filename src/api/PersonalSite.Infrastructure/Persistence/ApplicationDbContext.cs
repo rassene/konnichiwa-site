@@ -31,6 +31,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             e.HasIndex(v => v.Fingerprint).IsUnique();
             e.HasIndex(v => v.DataPurgeAt); // for purge background job
             e.Property(v => v.CountryCode).HasMaxLength(2);
+            e.Property(v => v.CurrentPage).HasMaxLength(500);
         });
 
         // ContactSubmission

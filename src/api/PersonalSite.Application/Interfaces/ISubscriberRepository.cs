@@ -24,4 +24,9 @@ public interface ISubscriberRepository
     Task<IReadOnlyList<Subscriber>> GetActiveByClusterSlugsAsync(
         string[] clusterSlugs,
         CancellationToken ct = default);
+
+    // ── Admin queries ─────────────────────────────────────────────────────────
+
+    Task<(int total, IReadOnlyList<Subscriber> items)> ListAsync(
+        string? clusterFilter, int page, int pageSize, CancellationToken ct = default);
 }

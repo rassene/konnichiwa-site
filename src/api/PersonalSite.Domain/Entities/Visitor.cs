@@ -14,6 +14,9 @@ public sealed class Visitor
     /// <summary>ISO 3166-1 alpha-2 country code derived from IP geolocation.</summary>
     public string? CountryCode { get; set; }
 
+    /// <summary>Most recently reported page path (from SignalR heartbeat).</summary>
+    public string? CurrentPage { get; set; }
+
     /// <summary>Scheduled purge date: FirstSeenAt + 12 months.</summary>
     public DateTime DataPurgeAt { get; set; }
 }

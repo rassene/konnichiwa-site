@@ -57,4 +57,21 @@ public sealed class SubscriberRepository(ApplicationDbContext db) : ISubscriberR
                      && s.Clusters.Any(sc => clusterSlugs.Contains(sc.ClusterSlug)))
             .ToListAsync(ct);
     }
+
+    public async Task<(int total, IReadOnlyList<Subscriber> items)> ListAsync(
+        string? clusterFilter, int page, int pageSize, CancellationToken ct = default)
+    {
+        var query = db.Subscribers.Include(s => s.Clusters).AsQueryable();
+        if (!string.IsNullOrWhiteSpace(clusterFilter))
+            query = query.Where(s => s.Clusters.Any(sc => sc.ClusterSlug == clusterFilter));
+
+        var total = await query.CountAsync(ct);
+        var items = await query
+            .OrderByDescending(s => s.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        return (total, items);
+    }
 }

@@ -1,10 +1,15 @@
 ---
-// Shell layer — full-viewport hero block.
-// JS cost: 0 (pure CSS animation via @keyframes). Respects prefers-reduced-motion.
+/**
+ * Shell layer — full-viewport hero block.
+ * JS cost: ~14 KB gzipped for WelcomeBack island (FingerprintJS OSS).
+ * Justified: powers returning-visitor personalisation and admin presence dashboard.
+ */
+import WelcomeBack from "./WelcomeBack.tsx";
 ---
 
 <section class="hero" aria-label="Introduction">
   <div class="hero__inner">
+    <WelcomeBack client:load />
     <p class="hero__eyebrow">hey, I'm</p>
     <h1 class="hero__name">
       <!-- Owner: replace with your display name -->

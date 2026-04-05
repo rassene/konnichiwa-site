@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PersonalSite.Api.Hubs;
+using PersonalSite.Api.Services;
 using PersonalSite.Application.Interfaces;
 using PersonalSite.Application.UseCases.Contact;
 using PersonalSite.Application.UseCases.Subscription;
@@ -110,6 +112,14 @@ builder.Services.AddScoped<ConfirmSubscriptionHandler>();
 builder.Services.AddScoped<VerifyTokenHandler>();
 builder.Services.AddScoped<UnsubscribeHandler>();
 
+// Visitor + presence
+builder.Services.AddScoped<IVisitorService, VisitorService>();
+builder.Services.AddHostedService<PresencePruneService>();
+
+// Admin auth + push
+builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
+builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
+
 // Newsletter dispatch job (registered for DI by Hangfire)
 builder.Services.AddScoped<NewsletterDispatchJob>();
 
@@ -162,6 +172,7 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 });
 
 app.MapControllers();
+app.MapHub<PresenceHub>("/hubs/presence");
 
 app.Run();
 
