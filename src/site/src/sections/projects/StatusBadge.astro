@@ -1,0 +1,54 @@
+---
+// Shell layer — project status badge, zero JS.
+import type { IProject } from '../../content/interfaces/index.js';
+
+interface Props {
+  status: IProject['status'];
+}
+
+const { status } = Astro.props;
+
+const LABELS: Record<IProject['status'], string> = {
+  'idea':        'Idea',
+  'in-progress': 'In Progress',
+  'completed':   'Completed',
+  'paused':      'Paused',
+};
+---
+
+<span class={`status-badge status-badge--${status}`} aria-label={`Status: ${LABELS[status]}`}>
+  {LABELS[status]}
+</span>
+
+<style>
+  .status-badge {
+    display: inline-block;
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-full);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .status-badge--idea {
+    background-color: #EEF2FF;
+    color: #4338CA;
+  }
+
+  .status-badge--in-progress {
+    background-color: #FFF7ED;
+    color: #C2410C;
+  }
+
+  .status-badge--completed {
+    background-color: #F0FDF4;
+    color: #15803D;
+  }
+
+  .status-badge--paused {
+    background-color: #F9FAFB;
+    color: #6B7280;
+  }
+</style>

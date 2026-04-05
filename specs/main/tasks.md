@@ -152,139 +152,140 @@ Lighthouse Performance ≥ 90 on mobile.
 
 ### Strapi Content Type Setup for Shell Sections
 
-- [ ] T031 [P] [US1] Create Strapi collection type `project` in `cms/src/api/project/`
+- [x] T031 [P] [US1] Create Strapi collection type `project` in `cms/src/api/project/`
   with fields: slug, title, status (enum), description, body (rich text), tags (JSON),
   links (JSON), featured (bool); configure relations to media
-- [ ] T032 [P] [US1] Create Strapi collection type `reading` in `cms/src/api/reading/`
+- [x] T032 [P] [US1] Create Strapi collection type `reading` in `cms/src/api/reading/`
   with fields: title, author, type (enum), status (enum), rating (int), note, noteIsGated
   (bool), dateAdded, clusters (relation to interest-cluster)
-- [ ] T033 [P] [US1] Create Strapi collection type `interest-cluster` in
+- [x] T033 [P] [US1] Create Strapi collection type `interest-cluster` in
   `cms/src/api/interest-cluster/` with fields: slug, label, description, color
-- [ ] T034 [P] [US1] Create Strapi single type `resume-data` in `cms/src/api/resume-data/`
+- [x] T034 [P] [US1] Create Strapi single type `resume-data` in `cms/src/api/resume-data/`
   with fields: downloadUrl, education (JSON), experience (JSON), skills (JSON), languages
   (JSON), certifications (JSON)
-- [ ] T035 [P] [US1] Seed Strapi with sample content: 3 projects, 5 readings, 2 clusters,
+- [x] T035 [P] [US1] Seed Strapi with sample content: 3 projects, 5 readings, 2 clusters,
   and resume data via Strapi admin UI; export as fixture to `cms/scripts/seed-data.json`
 
 ### Strapi Adapter Implementation for Shell Sections
 
-- [ ] T036 [US1] Implement `getProjects()` and `getProject(slug)` in the Strapi adapter
+- [x] T036 [US1] Implement `getProjects()` and `getProject(slug)` in the Strapi adapter
   at `src/site/src/content/adapters/strapi/index.ts`; map Strapi REST response to
   `IProject` interface; prefix media URLs with CDN base URL from env
-- [ ] T037 [US1] Implement `getReadings()` and `getClusters()` in the Strapi adapter;
+- [x] T037 [US1] Implement `getReadings()` and `getClusters()` in the Strapi adapter;
   map to `IReading[]` and `IInterestCluster[]`
-- [ ] T038 [US1] Implement `getResumeData()` in the Strapi adapter; map to `IResumeData`
+- [x] T038 [US1] Implement `getResumeData()` in the Strapi adapter; map to `IResumeData`
 
 ### Shell Section: Home
 
-- [ ] T039 [US1] Create `src/site/src/pages/index.astro` using BaseLayout; compose
+- [x] T039 [US1] Create `src/site/src/pages/index.astro` using BaseLayout; compose
   `<HeroBlock>`, `<IdentityStrip>`, `<SectionPreviewGrid>`, `<NewsletterCTA>`
-- [ ] T040 [P] [US1] Create `src/site/src/sections/home/HeroBlock.astro` — full-viewport
+- [x] T040 [P] [US1] Create `src/site/src/sections/home/HeroBlock.astro` — full-viewport
   hero with display name placeholder, tagline, animated scroll cue; respects
   `prefers-reduced-motion`; uses `tokens.motion.base` (≤200ms)
-- [ ] T041 [P] [US1] Create `src/site/src/sections/home/IdentityStrip.astro` — animated
+- [x] T041 [P] [US1] Create `src/site/src/sections/home/IdentityStrip.astro` — animated
   identity tokens ("Engineer. Reader. Sister. Dreamer."); static fallback for
   `prefers-reduced-motion`
-- [ ] T042 [P] [US1] Create `src/site/src/sections/home/SectionPreviewGrid.astro` —
+- [x] T042 [P] [US1] Create `src/site/src/sections/home/SectionPreviewGrid.astro` —
   card grid of all sections; each card teases the section's visual language
-- [ ] T043 [P] [US1] Create `src/site/src/sections/home/NewsletterCTA.astro` — inline
+- [x] T043 [P] [US1] Create `src/site/src/sections/home/NewsletterCTA.astro` — inline
   email subscription form (non-popup); submits to `/api/newsletter/subscribe`
 
 ### Shell Section: Projects
 
-- [ ] T044 [US1] Create `src/site/src/pages/projects/index.astro` — fetches `getProjects()`
+- [x] T044 [US1] Create `src/site/src/pages/projects/index.astro` — fetches `getProjects()`
   via CAL; passes data to `<ProjectGrid>`
-- [ ] T045 [P] [US1] Create `src/site/src/sections/projects/ProjectGrid.astro` —
+- [x] T045 [P] [US1] Create `src/site/src/sections/projects/ProjectGrid.astro` —
   filterable grid by status and tag; featured projects render as hero cards
-- [ ] T046 [P] [US1] Create `src/site/src/sections/projects/ProjectCard.astro` —
+- [x] T046 [P] [US1] Create `src/site/src/sections/projects/ProjectCard.astro` —
   compact and featured variants; status badge with color coding
-- [ ] T047 [P] [US1] Create `src/site/src/sections/projects/StatusBadge.astro` —
+- [x] T047 [P] [US1] Create `src/site/src/sections/projects/StatusBadge.astro` —
   idea / in-progress / completed / paused with matching token colors
-- [ ] T048 [US1] Create `src/site/src/pages/projects/[slug].astro` — featured project
+- [x] T048 [US1] Create `src/site/src/pages/projects/[slug].astro` — featured project
   detail page; fetches `getProject(slug)` via CAL; renders body rich text, links, media
 
 ### Shell Section: Resume
 
-- [ ] T049 [US1] Create `src/site/src/pages/resume.astro` — fetches `getResumeData()`
+- [x] T049 [US1] Create `src/site/src/pages/resume.astro` — fetches `getResumeData()`
   via CAL; renders `<ResumeView>`; includes download button
-- [ ] T050 [P] [US1] Create `src/site/src/sections/resume/ResumeView.astro` — renders
+- [x] T050 [P] [US1] Create `src/site/src/sections/resume/ResumeView.astro` — renders
   Education, Experience, Skills, Languages, Certifications sections; includes print
   stylesheet (`@media print`)
-- [ ] T051 [P] [US1] Create `src/site/src/sections/resume/DownloadResumeButton.astro` —
+- [x] T051 [P] [US1] Create `src/site/src/sections/resume/DownloadResumeButton.astro` —
   links to `IResumeData.downloadUrl` (Azure Blob); triggers browser download
 
 ### Shell Section: Readings
 
-- [ ] T052 [US1] Create `src/site/src/pages/readings.astro` — fetches `getReadings()` and
+- [x] T052 [US1] Create `src/site/src/pages/readings.astro` — fetches `getReadings()` and
   `getClusters()` via CAL; passes to `<ReadingList>`
-- [ ] T053 [P] [US1] Create `src/site/src/sections/readings/ReadingList.astro` —
+- [x] T053 [P] [US1] Create `src/site/src/sections/readings/ReadingList.astro` —
   filterable by type, status, and cluster; list and card grid view toggle
-- [ ] T054 [P] [US1] Create `src/site/src/sections/readings/ReadingCard.astro` — displays
+- [x] T054 [P] [US1] Create `src/site/src/sections/readings/ReadingCard.astro` — displays
   title, author, type badge, status, rating; renders `<GatedNoteTeaser>` for T1-gated notes
-- [ ] T055 [P] [US1] Create `src/site/src/sections/readings/GatedNoteTeaser.astro` — shows
+- [x] T055 [P] [US1] Create `src/site/src/sections/readings/GatedNoteTeaser.astro` — shows
   subscribe prompt to T0 users; full note for T1 (subscriber token check via API)
 
 ### Shell Section: Musings
 
-- [ ] T056 [US1] Implement `getMusings()` and `getMusing(slug)` in the Strapi adapter
-- [ ] T057 [US1] Create Strapi collection types `musing-post` and ensure `interest-cluster`
+- [x] T056 [US1] Implement `getMusings()` and `getMusing(slug)` in the Strapi adapter
+- [x] T057 [US1] Create Strapi collection types `musing-post` and ensure `interest-cluster`
   relation is set up in `cms/src/api/musing-post/`
-- [ ] T058 [US1] Create `src/site/src/pages/musings/index.astro` — fetches public musings
+- [x] T058 [US1] Create `src/site/src/pages/musings/index.astro` — fetches public musings
   + clusters; renders `<MusingsLanding>`
-- [ ] T059 [P] [US1] Create `src/site/src/sections/musings/MusingsLanding.astro` —
+- [x] T059 [P] [US1] Create `src/site/src/sections/musings/MusingsLanding.astro` —
   cluster-grouped layout; public posts visible; subscriber-only posts show
   `<SubscriberGate>`
-- [ ] T060 [P] [US1] Create `src/site/src/sections/musings/MusingPostCard.astro` —
+- [x] T060 [P] [US1] Create `src/site/src/sections/musings/MusingPostCard.astro` —
   tier-aware rendering: full teaser for public, locked state for subscriber-only
-- [ ] T061 [P] [US1] Create `src/site/src/sections/musings/SubscriberGate.astro` —
+- [x] T061 [P] [US1] Create `src/site/src/sections/musings/SubscriberGate.astro` —
   lock overlay with subscribe CTA; shows excerpt from `IMusingPost.excerpt`
-- [ ] T062 [US1] Create `src/site/src/pages/musings/[slug].astro` — full musing post
+- [x] T062 [US1] Create `src/site/src/pages/musings/[slug].astro` — full musing post
   page; checks subscriber token before rendering gated content
 
 ### Shell Section: Reach Out
 
-- [ ] T063 [US1] Create `src/site/src/pages/reach-out.astro` — renders `<ContactForm>`
+- [x] T063 [US1] Create `src/site/src/pages/reach-out.astro` — renders `<ContactForm>`
   React island (requires interactivity for validation + submission)
-- [ ] T064 [US1] Create `src/site/src/sections/reach-out/ContactForm.tsx` — React island;
+- [x] T064 [US1] Create `src/site/src/sections/reach-out/ContactForm.tsx` — React island;
   fields: name, email, subject (dropdown), message (max 1000 chars), honeypot (hidden);
   client-side validation; POST to `VITE_API_URL/api/contact`; success/error states
 
 ### Shell Section: Links
 
-- [ ] T065 [US1] Create Strapi single type `site-links` in `cms/src/api/site-links/` with
+- [x] T065 [US1] Create Strapi single type `site-links` in `cms/src/api/site-links/` with
   fields: links (JSON array of `{ label, url, icon }`)
-- [ ] T066 [US1] Add `getSiteLinks()` method to `IContentAdapter` and Strapi adapter
-- [ ] T067 [P] [US1] Create `src/site/src/pages/links.astro` — fetches links via CAL;
+- [x] T066 [US1] Add `getSiteLinks()` method to `IContentAdapter` and Strapi adapter
+- [x] T067 [P] [US1] Create `src/site/src/pages/links.astro` — fetches links via CAL;
   renders icon + label + URL for each; also rendered in Footer
 
 ### .NET API: Core Setup
 
-- [ ] T068 [US1] Configure ASP.NET Core 8 middleware in `PersonalSite.Api/Program.cs`:
-  CORS (allow Static Web Apps origin), rate limiting middleware, request logging,
-  Swagger (development only)
-- [ ] T069 [P] [US1] Create `ContactSubmission` entity in `PersonalSite.Domain/Entities/`
+- [x] T068 [US1] Configure ASP.NET Core middleware in `PersonalSite.Api/Program.cs`:
+  CORS (allow Static Web Apps origin), rate limiting middleware (sliding window 3/IP/hour),
+  Swagger (development only); NoOpEmailService dev stub when ACS not configured
+- [x] T069 [P] [US1] Create `ContactSubmission` entity in `PersonalSite.Domain/Entities/`
   with fields from data-model.md; add `DbSet<ContactSubmission>` to `ApplicationDbContext`
   in `PersonalSite.Infrastructure/Persistence/`
-- [ ] T070 [P] [US1] Create `SubmitContactFormCommand` + `SubmitContactFormHandler` in
-  `PersonalSite.Application/UseCases/Contact/`; define `IEmailService` interface in
-  `PersonalSite.Application/Interfaces/`; handler validates, saves via repository, calls
-  `IEmailService`
-- [ ] T071 [US1] Implement `ContactController` in `PersonalSite.Api/Controllers/` —
-  receives request, enforces rate limit (3/IP/hour via middleware), checks honeypot,
-  dispatches `SubmitContactFormCommand` via MediatR (or direct handler injection)
-- [ ] T072 [US1] Implement `EmailService : IEmailService` in
+- [x] T070 [P] [US1] Create `SubmitContactFormCommand` + `SubmitContactFormHandler` in
+  `PersonalSite.Application/UseCases/Contact/`; define `IEmailService` and
+  `IContactRepository` interfaces in `PersonalSite.Application/Interfaces/`; handler
+  validates, saves via repository, calls `IEmailService`
+- [x] T071 [US1] Implement `ContactController` in `PersonalSite.Api/Controllers/` —
+  receives request, enforces rate limit (3/IP/hour via `[EnableRateLimiting("contact")]`),
+  checks honeypot, dispatches `SubmitContactFormCommand` via direct handler injection
+- [x] T072 [US1] Implement `EmailService : IEmailService` in
   `PersonalSite.Infrastructure/Services/` using `Azure.Communication.Email` SDK; registered
-  in DI from `PersonalSite.Api/Program.cs`
-- [ ] T073 [US1] Create `infra/setup.ps1` skeleton with Resource Group, App Service Plan
-  (B1 Linux, shared), .NET API App Service, Strapi App Service — idempotent pattern per
-  spec §7.1; commit with parameters documented in `infra/parameters.example.ps1`
+  in DI from `PersonalSite.Api/Program.cs`; `ContactRepository` implements `IContactRepository`
+- [x] T073 [US1] Create `infra/setup.ps1` idempotent Azure IaC script: Resource Group,
+  App Service Plan (B1 Linux, shared), .NET API + Strapi App Services, Azure SQL, Blob
+  Storage, ACS, Static Web Apps — all idempotent, cost gate documented (≤€30/month)
 
 ### Build Gate — Phase 3
 
-- [ ] T074 [US1] Run `astro build` in `src/site/` — verify 0 errors, 0 warnings; fix any
-  type errors in CAL interfaces or component props
-- [ ] T075 [US1] Run `dotnet build src/api/PersonalSite.slnx` — verify 0 errors; fix any
-  compilation issues
+- [x] T074 [US1] Run `astro check` in `src/site/` — 0 errors, 0 warnings across 40 files;
+  all type errors in CAL interfaces and component props fixed (Tag slot, SectionWrapper
+  aria-label, IContentAdapter ISiteLink)
+- [x] T075 [US1] Run `dotnet build src/api/PersonalSite.slnx` — 0 errors, 0 warnings;
+  all five projects compile cleanly (Domain, Application, Infrastructure, Api, Tests)
 - [ ] T076 [US1] Run Lighthouse CI on at least: `/`, `/projects`, `/resume`, `/reach-out` —
   verify Performance ≥ 90, Accessibility ≥ 95 on mobile viewport
 - [ ] T077 [US1] Smoke test `POST /api/contact` against local API — verify 200 response

@@ -1,0 +1,175 @@
+---
+// Musing post detail page — shell layer, T062.
+// Gated posts show SubscriberGate for T0 users; full content for T1 (Phase 4).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionWrapper from '../../components/SectionWrapper.astro';
+import SubscriberGate from '../../sections/musings/SubscriberGate.astro';
+import Tag from '../../components/Tag.astro';
+import { content } from '../../content/index.js';
+import type { IMusingPost } from '../../content/interfaces/index.js';
+
+export async function getStaticPaths() {
+  const musings = await content.getMusings();
+  return musings.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: IMusingPost;
+}
+
+const { post } = Astro.props;
+const clusters = await content.getClusters();
+const postClusters = clusters.filter((c) => post.clusters.includes(c.slug));
+
+const dateFormatted = new Date(post.publishedAt).toLocaleDateString('en-GB', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+
+const FORMAT_LABELS: Record<IMusingPost['format'], string> = {
+  essay:  'Essay',
+  note:   'Note',
+  thread: 'Thread',
+  quote:  'Quote',
+};
+---
+
+<BaseLayout
+  title={post.title}
+  description={post.excerpt}
+  ogImage={post.coverImage?.url}
+>
+  <SectionWrapper>
+    <article class="musing-post">
+      <header class="musing-post__header">
+        <div class="musing-post__meta">
+          <span class="musing-post__format">{FORMAT_LABELS[post.format]}</span>
+          <time class="musing-post__date" datetime={post.publishedAt}>{dateFormatted}</time>
+        </div>
+        <h1 class="musing-post__title">{post.title}</h1>
+
+        {postClusters.length > 0 && (
+          <ul class="musing-post__clusters" role="list" aria-label="Topics">
+            {postClusters.map((c) => (
+              <li><Tag color={c.color}>{c.label}</Tag></li>
+            ))}
+          </ul>
+        )}
+      </header>
+
+      {post.coverImage && (
+        <div class="musing-post__cover">
+          <img
+            src={post.coverImage.url}
+            alt={post.coverImage.alt}
+            width={post.coverImage.width}
+            height={post.coverImage.height}
+            loading="eager"
+          />
+        </div>
+      )}
+
+      {post.tier === 'subscriber' ? (
+        <SubscriberGate excerpt={post.excerpt} title={post.title} />
+      ) : (
+        <div class="musing-post__body prose" set:html={post.body} />
+      )}
+
+      <footer class="musing-post__footer">
+        <a href="/musings" class="musing-post__back">← All musings</a>
+      </footer>
+    </article>
+  </SectionWrapper>
+</BaseLayout>
+
+<style>
+  .musing-post {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .musing-post__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .musing-post__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .musing-post__format {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .musing-post__date {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  .musing-post__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  .musing-post__clusters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .musing-post__cover {
+    margin-bottom: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .musing-post__cover img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .musing-post__body {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-text);
+  }
+
+  .musing-post__footer {
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .musing-post__back {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--motion-fast);
+  }
+
+  .musing-post__back:hover {
+    color: var(--color-accent);
+  }
+</style>

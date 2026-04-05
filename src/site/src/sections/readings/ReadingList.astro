@@ -1,0 +1,159 @@
+---
+// Shell layer — filterable reading list with cluster/type/status filters. Zero JS (CSS :has()).
+import type { IReading, IInterestCluster } from '../../content/interfaces/index.js';
+import ReadingCard from './ReadingCard.astro';
+import SectionWrapper from '../../components/SectionWrapper.astro';
+
+interface Props {
+  readings: IReading[];
+  clusters: IInterestCluster[];
+}
+
+const { readings, clusters } = Astro.props;
+
+const ALL_TYPES: IReading['type'][] = ['book', 'article', 'paper', 'podcast', 'video'];
+const TYPE_LABELS: Record<IReading['type'], string> = {
+  book:    'Books',
+  article: 'Articles',
+  paper:   'Papers',
+  podcast: 'Podcasts',
+  video:   'Videos',
+};
+
+const availableTypes = ALL_TYPES.filter((t) => readings.some((r) => r.type === t));
+---
+
+<SectionWrapper id="readings" aria-label="Readings">
+  <header class="reading-list__header">
+    <h1 class="reading-list__title">Readings</h1>
+    <p class="reading-list__desc">
+      Books, articles, papers, and more — everything on my shelf and what I thought about it.
+    </p>
+  </header>
+
+  {(availableTypes.length > 0 || clusters.length > 0) && (
+    <div class="reading-list__filters" role="group" aria-label="Filter readings">
+      {availableTypes.length > 0 && (
+        <div class="reading-list__filter-group">
+          <span class="reading-list__filter-label">Type:</span>
+          {availableTypes.map((type) => (
+            <label class="reading-list__filter-chip">
+              <input type="radio" name="reading-type" value={type} class="reading-list__filter-radio" />
+              {TYPE_LABELS[type]}
+            </label>
+          ))}
+        </div>
+      )}
+
+      {clusters.length > 0 && (
+        <div class="reading-list__filter-group">
+          <span class="reading-list__filter-label">Cluster:</span>
+          {clusters.map((c) => (
+            <label class="reading-list__filter-chip" style={`--chip-color: ${c.color}`}>
+              <input type="radio" name="reading-cluster" value={c.slug} class="reading-list__filter-radio" />
+              {c.label}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  )}
+
+  {readings.length > 0 ? (
+    <ul class="reading-list__grid" role="list" data-readings-list>
+      {readings.map((r) => (
+        <li data-type={r.type} data-clusters={r.clusters.join(',')}>
+          <ReadingCard reading={r} clusters={clusters} />
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="reading-list__empty">Nothing here yet — check back soon.</p>
+  )}
+</SectionWrapper>
+
+<style>
+  .reading-list__header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .reading-list__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-md);
+    line-height: 1.1;
+  }
+
+  .reading-list__desc {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    color: var(--color-text-muted);
+    max-width: 640px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .reading-list__filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+
+  .reading-list__filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .reading-list__filter-label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    min-width: 60px;
+  }
+
+  .reading-list__filter-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .reading-list__filter-chip {
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: border-color var(--motion-fast), color var(--motion-fast);
+    position: relative;
+  }
+
+  .reading-list__filter-chip:has(input:checked) {
+    border-color: var(--chip-color, var(--color-accent));
+    color: var(--chip-color, var(--color-accent));
+    background-color: var(--color-accent-soft);
+  }
+
+  .reading-list__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .reading-list__empty {
+    font-family: var(--font-body);
+    color: var(--color-text-muted);
+    text-align: center;
+    padding: var(--space-3xl) 0;
+  }
+</style>

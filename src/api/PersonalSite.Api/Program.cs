@@ -1,10 +1,17 @@
+using Azure.Communication.Email;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PersonalSite.Application.Interfaces;
+using PersonalSite.Application.UseCases.Contact;
 using PersonalSite.Infrastructure.Persistence;
+using PersonalSite.Infrastructure.Repositories;
+using PersonalSite.Infrastructure.Services;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +30,9 @@ builder.Services.AddHangfire(config => config
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
     {
-        CommandBatchMaxTimeout      = TimeSpan.FromMinutes(5),
-        SlidingInvisibilityTimeout  = TimeSpan.FromMinutes(5),
-        QueuePollInterval           = TimeSpan.Zero,
+        CommandBatchMaxTimeout       = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout   = TimeSpan.FromMinutes(5),
+        QueuePollInterval            = TimeSpan.Zero,
         UseRecommendedIsolationLevel = true,
         DisableGlobalLocks           = true,
     }));
@@ -63,6 +70,53 @@ builder.Services.AddCors(options =>
               .AllowCredentials());
 });
 
+// ─── Rate Limiting ─────────────────────────────────────────────────────────────
+// "contact" policy: 3 requests per IP per hour (sliding window).
+builder.Services.AddRateLimiter(opts =>
+{
+    opts.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new { error = "Rate limit exceeded.", detail = "Too many requests. Try again later." },
+            token);
+    };
+
+    opts.AddPolicy("contact", context =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit         = 3,
+                Window              = TimeSpan.FromHours(1),
+                SegmentsPerWindow   = 6,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit          = 0,
+            }));
+});
+
+// ─── Application Services ─────────────────────────────────────────────────────
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<SubmitContactFormHandler>();
+
+// Azure Communication Services — email
+var acsConnectionString = builder.Configuration["Acs:ConnectionString"];
+if (!string.IsNullOrWhiteSpace(acsConnectionString))
+{
+    builder.Services.AddSingleton(new EmailClient(acsConnectionString));
+    builder.Services.AddSingleton<IEmailService>(sp => new EmailService(
+        client:        sp.GetRequiredService<EmailClient>(),
+        senderAddress: builder.Configuration["Acs:SenderAddress"]
+                           ?? throw new InvalidOperationException("Acs:SenderAddress not configured."),
+        ownerAddress:  builder.Configuration["Acs:OwnerAddress"]
+                           ?? throw new InvalidOperationException("Acs:OwnerAddress not configured.")));
+}
+else
+{
+    // Development stub — logs to console, does not send real emails.
+    builder.Services.AddSingleton<IEmailService, NoOpEmailService>();
+}
+
 // ─── MVC / API ────────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
@@ -83,6 +137,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -95,3 +150,21 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 app.MapControllers();
 
 app.Run();
+
+// ─── Development stubs ──────────────────────────────────────────────────────
+
+/// <summary>
+/// No-op email service for local development (ACS not configured).
+/// Prints notification content to the console instead of sending an email.
+/// </summary>
+internal sealed class NoOpEmailService : IEmailService
+{
+    public Task SendOwnerNotificationAsync(
+        string subject, string textBody, string htmlBody,
+        CancellationToken cancellationToken = default)
+    {
+        Console.WriteLine($"[NoOpEmailService] Subject: {subject}");
+        Console.WriteLine($"[NoOpEmailService] Body: {textBody}");
+        return Task.CompletedTask;
+    }
+}

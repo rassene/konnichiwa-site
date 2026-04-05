@@ -1,0 +1,96 @@
+---
+// Shell layer — animated identity token strip.
+// "Engineer. Reader. Sister. Dreamer." cycles with CSS animation.
+// Static fallback for prefers-reduced-motion.
+
+const TOKENS = ['Engineer', 'Reader', 'Sister', 'Dreamer'];
+---
+
+<div class="identity-strip" aria-label="Who I am">
+  {/* Static version — always visible, hidden via CSS when animation is on */}
+  <p class="identity-strip__static" aria-hidden="true">
+    {TOKENS.map((t, i) => (
+      <span class="identity-strip__token">
+        {t}{i < TOKENS.length - 1 && <span class="identity-strip__sep" aria-hidden="true">·</span>}
+      </span>
+    ))}
+  </p>
+
+  {/* Animated version — hidden for reduced-motion */}
+  <div class="identity-strip__animated" aria-live="polite">
+    {TOKENS.map((token, i) => (
+      <span
+        class="identity-strip__word"
+        style={`animation-delay: ${i * 2}s`}
+      >
+        {token}
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .identity-strip {
+    padding: var(--space-lg) var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Static layout (always present in DOM for accessibility) */
+  .identity-strip__static {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+  }
+
+  .identity-strip__sep {
+    color: var(--color-accent);
+    margin-left: var(--space-sm);
+  }
+
+  /* Animated version — hidden for reduced-motion, shown otherwise */
+  .identity-strip__animated {
+    display: none;
+    position: relative;
+    height: 2rem;
+    overflow: hidden;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .identity-strip__word {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: identity-fade 8s linear infinite;
+  }
+
+  @keyframes identity-fade {
+    0%   { opacity: 0; transform: translateY(10px); }
+    5%   { opacity: 1; transform: translateY(0); }
+    20%  { opacity: 1; transform: translateY(0); }
+    25%  { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .identity-strip__static {
+      display: none;
+    }
+    .identity-strip__animated {
+      display: block;
+    }
+  }
+</style>

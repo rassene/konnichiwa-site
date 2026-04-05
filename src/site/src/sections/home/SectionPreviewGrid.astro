@@ -1,0 +1,179 @@
+---
+// Shell layer — grid of section preview cards linking to all main sections.
+// No JS required. Cards tease each section's visual language.
+
+const SECTIONS = [
+  {
+    href: '/projects',
+    title: 'Projects',
+    description: 'Things I build — ideas, work-in-progress, and shipped.',
+    accent: 'var(--color-accent)',
+    icon: '⚙',
+  },
+  {
+    href: '/life-map',
+    title: 'Life Map',
+    description: 'An interactive timeline of milestones, big and small.',
+    accent: '#1A1A18',
+    icon: '◎',
+  },
+  {
+    href: '/family',
+    title: 'Meet the Family',
+    description: 'The people who make me who I am.',
+    accent: '#E8A87C',
+    icon: '♡',
+  },
+  {
+    href: '/readings',
+    title: 'Readings',
+    description: 'Books, articles, papers — everything I\'ve been reading.',
+    accent: '#9B59B6',
+    icon: '◻',
+  },
+  {
+    href: '/musings',
+    title: 'Musings',
+    description: 'Notes, essays, and half-formed ideas.',
+    accent: '#4A90D9',
+    icon: '✦',
+  },
+  {
+    href: '/resume',
+    title: 'Resume',
+    description: 'My professional background and experience.',
+    accent: '#2ECC71',
+    icon: '⊞',
+  },
+  {
+    href: '/reach-out',
+    title: 'Reach Out',
+    description: 'Say hello — I read every message.',
+    accent: 'var(--color-accent)',
+    icon: '✉',
+  },
+  {
+    href: '/links',
+    title: 'Links',
+    description: 'A curated list of places to find me online.',
+    accent: '#E67E22',
+    icon: '→',
+  },
+];
+---
+
+<section class="preview-grid" id="sections" aria-label="Site sections">
+  <div class="preview-grid__inner">
+    <h2 class="preview-grid__heading">Explore</h2>
+    <ul class="preview-grid__list" role="list">
+      {SECTIONS.map(({ href, title, description, accent, icon }) => (
+        <li>
+          <a href={href} class="preview-card" style={`--card-accent: ${accent}`}>
+            <span class="preview-card__icon" aria-hidden="true">{icon}</span>
+            <span class="preview-card__title">{title}</span>
+            <span class="preview-card__desc">{description}</span>
+            <span class="preview-card__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .preview-grid {
+    padding: var(--space-3xl) var(--space-md);
+    background-color: var(--color-background);
+  }
+
+  .preview-grid__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .preview-grid__heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--color-text);
+    margin-bottom: var(--space-xl);
+  }
+
+  .preview-grid__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-md);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .preview-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: border-color var(--motion-base), box-shadow var(--motion-base),
+      transform var(--motion-base);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--card-accent);
+    opacity: 0;
+    transition: opacity var(--motion-base);
+  }
+
+  .preview-card:hover {
+    border-color: var(--card-accent);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .preview-card:hover::before {
+    opacity: 1;
+  }
+
+  .preview-card__icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--card-accent);
+  }
+
+  .preview-card__title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .preview-card__desc {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .preview-card__arrow {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--card-accent);
+    align-self: flex-end;
+    transition: transform var(--motion-fast);
+  }
+
+  .preview-card:hover .preview-card__arrow {
+    transform: translateX(4px);
+  }
+</style>

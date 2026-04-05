@@ -1,0 +1,134 @@
+---
+// Shell layer — inline newsletter subscription CTA (non-popup).
+// Submits to /api/newsletter/subscribe via POST.
+// JS cost: 0 for the static form; client-side enhancement is handled by the
+// React island NewsletterCTA.tsx (Phase 4 upgrade — T087).
+const API_URL = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:5000';
+---
+
+<section class="newsletter-cta" id="subscribe" aria-label="Newsletter subscription">
+  <div class="newsletter-cta__inner">
+    <div class="newsletter-cta__copy">
+      <h2 class="newsletter-cta__heading">Stay in the loop</h2>
+      <p class="newsletter-cta__desc">
+        Subscribe to get notified when I publish new musings or update my readings list.
+        No spam. Unsubscribe anytime.
+      </p>
+    </div>
+    <form
+      class="newsletter-cta__form"
+      method="POST"
+      action={`${API_URL}/api/newsletter/subscribe`}
+      novalidate
+    >
+      <label class="newsletter-cta__label" for="newsletter-email">Email address</label>
+      <div class="newsletter-cta__row">
+        <input
+          id="newsletter-email"
+          class="newsletter-cta__input"
+          type="email"
+          name="email"
+          placeholder="you@example.com"
+          required
+          autocomplete="email"
+        />
+        {/* Hidden default cluster — Phase 4 (T087) replaces this with full cluster picker */}
+        <input type="hidden" name="clusters" value="general" />
+        <button class="newsletter-cta__btn" type="submit">Subscribe</button>
+      </div>
+      <p class="newsletter-cta__note">
+        You'll receive a confirmation email. No spam.
+      </p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .newsletter-cta {
+    padding: var(--space-2xl) var(--space-md);
+    background-color: var(--color-accent-soft);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .newsletter-cta__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .newsletter-cta__heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--color-text);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .newsletter-cta__desc {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .newsletter-cta__label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+  }
+
+  .newsletter-cta__row {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .newsletter-cta__input {
+    flex: 1;
+    min-width: 200px;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color var(--motion-fast);
+  }
+
+  .newsletter-cta__input:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-color: var(--color-accent);
+  }
+
+  .newsletter-cta__btn {
+    padding: var(--space-sm) var(--space-lg);
+    background-color: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity var(--motion-fast);
+    white-space: nowrap;
+  }
+
+  .newsletter-cta__btn:hover {
+    opacity: 0.88;
+  }
+
+  .newsletter-cta__note {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin: var(--space-sm) 0 0;
+  }
+</style>

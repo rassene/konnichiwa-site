@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_links",
+  "info": {
+    "singularName": "site-links",
+    "pluralName": "site-links",
+    "displayName": "Site Links",
+    "description": "Link-in-bio style curated links shown on /links and in Footer"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "links": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

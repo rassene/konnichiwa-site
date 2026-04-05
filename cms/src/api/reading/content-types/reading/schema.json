@@ -1,0 +1,63 @@
+{
+  "kind": "collectionType",
+  "collectionName": "readings",
+  "info": {
+    "singularName": "reading",
+    "pluralName": "readings",
+    "displayName": "Reading",
+    "description": "Books, articles, papers, podcasts, and videos"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 300
+    },
+    "author": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["book", "article", "paper", "podcast", "video"],
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["reading", "completed", "want-to-read"],
+      "required": true,
+      "default": "want-to-read"
+    },
+    "rating": {
+      "type": "integer",
+      "min": 1,
+      "max": 5
+    },
+    "note": {
+      "type": "text"
+    },
+    "noteIsGated": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "dateAdded": {
+      "type": "date",
+      "required": true
+    },
+    "coverUrl": {
+      "type": "string"
+    },
+    "clusters": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::interest-cluster.interest-cluster",
+      "mappedBy": "readings"
+    }
+  }
+}

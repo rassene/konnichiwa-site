@@ -1,0 +1,199 @@
+---
+// Project detail page — shell layer, T048.
+// Only featured projects have detail pages; non-featured 404.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionWrapper from '../../components/SectionWrapper.astro';
+import StatusBadge from '../../sections/projects/StatusBadge.astro';
+import Tag from '../../components/Tag.astro';
+import { content } from '../../content/index.js';
+
+export async function getStaticPaths() {
+  const projects = await content.getProjects({ featured: true });
+  return projects.map((p) => ({ params: { slug: p.slug }, props: { project: p } }));
+}
+
+const { project } = Astro.props;
+const coverImage = project.media?.[0];
+---
+
+<BaseLayout
+  title={project.title}
+  description={project.description}
+  ogImage={coverImage?.url}
+>
+  <SectionWrapper>
+    <article class="project-detail">
+      <header class="project-detail__header">
+        <div class="project-detail__meta">
+          <StatusBadge status={project.status} />
+          {project.startDate && (
+            <time class="project-detail__date" datetime={project.startDate}>
+              {new Date(project.startDate).getFullYear()}
+              {project.endDate && ` – ${new Date(project.endDate).getFullYear()}`}
+            </time>
+          )}
+        </div>
+        <h1 class="project-detail__title">{project.title}</h1>
+        <p class="project-detail__desc">{project.description}</p>
+
+        {project.tags.length > 0 && (
+          <ul class="project-detail__tags" role="list" aria-label="Tags">
+            {project.tags.map((tag) => <li><Tag>{tag}</Tag></li>)}
+          </ul>
+        )}
+
+        {project.links && project.links.length > 0 && (
+          <ul class="project-detail__links" role="list">
+            {project.links.map(({ label, url }) => (
+              <li>
+                <a
+                  href={url}
+                  class="project-detail__link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {label} ↗
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </header>
+
+      {coverImage && (
+        <div class="project-detail__cover">
+          <img
+            src={coverImage.url}
+            alt={coverImage.alt}
+            width={coverImage.width}
+            height={coverImage.height}
+            loading="eager"
+          />
+        </div>
+      )}
+
+      {project.body && (
+        <div class="project-detail__body prose" set:html={project.body} />
+      )}
+
+      <footer class="project-detail__footer">
+        <a href="/projects" class="project-detail__back">← All projects</a>
+      </footer>
+    </article>
+  </SectionWrapper>
+</BaseLayout>
+
+<style>
+  .project-detail {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .project-detail__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .project-detail__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .project-detail__date {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .project-detail__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .project-detail__desc {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .project-detail__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .project-detail__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .project-detail__link {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    transition: background-color var(--motion-fast), color var(--motion-fast);
+  }
+
+  .project-detail__link:hover {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
+
+  .project-detail__cover {
+    margin-bottom: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .project-detail__cover img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .project-detail__body {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--color-text);
+  }
+
+  .project-detail__footer {
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .project-detail__back {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--motion-fast);
+  }
+
+  .project-detail__back:hover {
+    color: var(--color-accent);
+  }
+</style>

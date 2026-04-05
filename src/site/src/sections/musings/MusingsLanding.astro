@@ -1,0 +1,123 @@
+---
+// Shell layer — musings landing with cluster grouping. Zero JS.
+// Public posts fully visible; gated posts show SubscriberGate.
+import type { IMusingPost, IInterestCluster } from '../../content/interfaces/index.js';
+import MusingPostCard from './MusingPostCard.astro';
+import SectionWrapper from '../../components/SectionWrapper.astro';
+
+interface Props {
+  musings: IMusingPost[];
+  clusters: IInterestCluster[];
+}
+
+const { musings, clusters } = Astro.props;
+
+// Group posts by first cluster (unclustered posts go to 'all')
+const grouped: Map<string, IMusingPost[]> = new Map();
+grouped.set('all', []);
+
+for (const post of musings) {
+  if (post.clusters.length === 0) {
+    grouped.get('all')!.push(post);
+    continue;
+  }
+  const firstCluster = post.clusters[0];
+  if (!grouped.has(firstCluster)) grouped.set(firstCluster, []);
+  grouped.get(firstCluster)!.push(post);
+}
+
+const clusterMap = new Map(clusters.map((c) => [c.slug, c]));
+---
+
+<SectionWrapper id="musings" aria-label="Musings">
+  <header class="musings-landing__header">
+    <h1 class="musings-landing__title">Musings</h1>
+    <p class="musings-landing__desc">
+      Notes, essays, and half-formed ideas. Some are public, some are for subscribers.
+    </p>
+  </header>
+
+  {musings.length === 0 && (
+    <p class="musings-landing__empty">No posts yet — check back soon.</p>
+  )}
+
+  {Array.from(grouped.entries()).map(([slug, posts]) => {
+    if (posts.length === 0) return null;
+    const cluster = slug === 'all' ? null : clusterMap.get(slug);
+    return (
+      <section class="musings-landing__cluster-group" aria-labelledby={`cluster-${slug}`}>
+        {cluster && (
+          <h2
+            class="musings-landing__cluster-title"
+            id={`cluster-${slug}`}
+            style={`--cluster-color: ${cluster.color}`}
+          >
+            {cluster.label}
+          </h2>
+        )}
+        <ul class="musings-landing__grid" role="list">
+          {posts.map((post) => (
+            <li>
+              <MusingPostCard post={post} clusters={clusters} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  })}
+</SectionWrapper>
+
+<style>
+  .musings-landing__header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .musings-landing__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-md);
+    line-height: 1.1;
+  }
+
+  .musings-landing__desc {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    color: var(--color-text-muted);
+    max-width: 640px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .musings-landing__cluster-group {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .musings-landing__cluster-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--cluster-color, var(--color-accent));
+    margin: 0 0 var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--cluster-color, var(--color-accent));
+    display: inline-block;
+  }
+
+  .musings-landing__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .musings-landing__empty {
+    font-family: var(--font-body);
+    color: var(--color-text-muted);
+    text-align: center;
+    padding: var(--space-3xl) 0;
+  }
+</style>

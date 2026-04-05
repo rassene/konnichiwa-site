@@ -1,0 +1,159 @@
+---
+// Shell layer — filterable project grid. Zero JS (CSS-only filter via :has()).
+// Featured projects render as hero cards. Filter by status uses hidden radio buttons.
+import type { IProject } from '../../content/interfaces/index.js';
+import ProjectCard from './ProjectCard.astro';
+import SectionWrapper from '../../components/SectionWrapper.astro';
+
+interface Props {
+  projects: IProject[];
+}
+
+const { projects } = Astro.props;
+
+const ALL_STATUSES: IProject['status'][] = ['in-progress', 'completed', 'idea', 'paused'];
+const STATUS_LABELS: Record<IProject['status'], string> = {
+  'idea':        'Ideas',
+  'in-progress': 'In Progress',
+  'completed':   'Completed',
+  'paused':      'Paused',
+};
+
+const featured = projects.filter((p) => p.featured);
+const rest = projects.filter((p) => !p.featured);
+---
+
+<SectionWrapper id="projects" aria-label="Projects">
+  {featured.length > 0 && (
+    <div class="project-grid__featured">
+      <h2 class="project-grid__heading">Featured</h2>
+      <ul class="project-grid__list project-grid__list--featured" role="list">
+        {featured.map((p) => (
+          <li>
+            <ProjectCard project={p} featured />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {rest.length > 0 && (
+    <div class="project-grid__all">
+      <div class="project-grid__filters" role="group" aria-label="Filter by status">
+        <span class="project-grid__filter-label">Filter:</span>
+        {ALL_STATUSES.filter((s) => rest.some((p) => p.status === s)).map((status) => (
+          <label class="project-grid__filter-chip">
+            <input type="radio" name="project-filter" value={status} class="project-grid__filter-radio" />
+            {STATUS_LABELS[status]}
+          </label>
+        ))}
+      </div>
+
+      <ul class="project-grid__list" role="list" data-filter-group>
+        {rest.map((p) => (
+          <li data-status={p.status}>
+            <ProjectCard project={p} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {projects.length === 0 && (
+    <p class="project-grid__empty">No projects yet — check back soon.</p>
+  )}
+</SectionWrapper>
+
+<style>
+  .project-grid__heading {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-lg);
+  }
+
+  .project-grid__featured {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .project-grid__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .project-grid__list--featured {
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  }
+
+  .project-grid__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+
+  .project-grid__filter-label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .project-grid__filter-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .project-grid__filter-chip {
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: border-color var(--motion-fast), color var(--motion-fast),
+      background-color var(--motion-fast);
+    position: relative;
+  }
+
+  .project-grid__filter-chip:has(input:checked) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-accent-soft);
+  }
+
+  /* Filter items by status when a radio is checked */
+  .project-grid__filters:has([value="in-progress"]:checked) ~ .project-grid__list [data-status]:not([data-status="in-progress"]) {
+    display: none;
+  }
+  .project-grid__filters:has([value="completed"]:checked) ~ .project-grid__list [data-status]:not([data-status="completed"]) {
+    display: none;
+  }
+  .project-grid__filters:has([value="idea"]:checked) ~ .project-grid__list [data-status]:not([data-status="idea"]) {
+    display: none;
+  }
+  .project-grid__filters:has([value="paused"]:checked) ~ .project-grid__list [data-status]:not([data-status="paused"]) {
+    display: none;
+  }
+
+  .project-grid__all {
+    /* Scoping context for :has() sibling selector above */
+  }
+
+  .project-grid__empty {
+    font-family: var(--font-body);
+    color: var(--color-text-muted);
+    text-align: center;
+    padding: var(--space-3xl) 0;
+  }
+</style>

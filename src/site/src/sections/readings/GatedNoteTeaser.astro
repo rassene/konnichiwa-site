@@ -1,0 +1,92 @@
+---
+// Shell layer — gated reading note teaser.
+// T0 users see subscribe prompt; full note visible to T1 (Phase 4 wires up token check).
+// JS cost: 0 for the static fallback shown here. Token check is added in Phase 4 (T086).
+interface Props {
+  note: string;
+  isGated: boolean;
+}
+
+const { note, isGated } = Astro.props;
+---
+
+{isGated ? (
+  <div class="gated-teaser" role="complementary" aria-label="Subscriber-only note">
+    <div class="gated-teaser__blur" aria-hidden="true">
+      {note.slice(0, 80)}…
+    </div>
+    <div class="gated-teaser__overlay">
+      <span class="gated-teaser__lock" aria-hidden="true">🔒</span>
+      <p class="gated-teaser__copy">This note is for subscribers.</p>
+      <a href="#subscribe" class="gated-teaser__cta">Subscribe to read →</a>
+    </div>
+  </div>
+) : (
+  <p class="reading-note">{note}</p>
+)}
+
+<style>
+  .gated-teaser {
+    position: relative;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .gated-teaser__blur {
+    padding: var(--space-md);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    filter: blur(4px);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .gated-teaser__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--color-surface) 60%
+    );
+    padding: var(--space-md);
+    text-align: center;
+  }
+
+  .gated-teaser__lock {
+    font-size: 1.25rem;
+  }
+
+  .gated-teaser__copy {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .gated-teaser__cta {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .reading-note {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0;
+    padding: var(--space-md);
+    border-left: 3px solid var(--color-accent-soft);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+</style>

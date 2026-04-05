@@ -1,0 +1,176 @@
+---
+// Shell layer — reading card with type/status badges and optional gated note. Zero JS.
+import type { IReading, IInterestCluster } from '../../content/interfaces/index.js';
+import Tag from '../../components/Tag.astro';
+import GatedNoteTeaser from './GatedNoteTeaser.astro';
+
+interface Props {
+  reading: IReading;
+  clusters: IInterestCluster[];
+}
+
+const { reading, clusters } = Astro.props;
+
+const TYPE_LABELS: Record<IReading['type'], string> = {
+  book:    'Book',
+  article: 'Article',
+  paper:   'Paper',
+  podcast: 'Podcast',
+  video:   'Video',
+};
+
+const STATUS_LABELS: Record<IReading['status'], string> = {
+  'reading':       'Reading',
+  'completed':     'Finished',
+  'want-to-read':  'Want to Read',
+};
+
+const readingClusters = clusters.filter((c) => reading.clusters.includes(c.slug));
+const STARS = Array.from({ length: 5 }, (_, i) => i + 1);
+---
+
+<article class="reading-card">
+  <header class="reading-card__header">
+    <div class="reading-card__meta">
+      <span class="reading-card__type">{TYPE_LABELS[reading.type]}</span>
+      <span class:list={['reading-card__status', `reading-card__status--${reading.status.replace('-', '')}`]}>
+        {STATUS_LABELS[reading.status]}
+      </span>
+    </div>
+
+    <div class="reading-card__body">
+      <h3 class="reading-card__title">{reading.title}</h3>
+      <p class="reading-card__author">{reading.author}</p>
+    </div>
+
+    {reading.rating && (
+      <div class="reading-card__rating" aria-label={`Rating: ${reading.rating} out of 5`}>
+        {STARS.map((s) => (
+          <span class:list={['reading-card__star', { 'reading-card__star--filled': s <= reading.rating! }]} aria-hidden="true">
+            ★
+          </span>
+        ))}
+      </div>
+    )}
+  </header>
+
+  {reading.note && (
+    <div class="reading-card__note">
+      <GatedNoteTeaser note={reading.note} isGated={reading.noteIsGated} />
+    </div>
+  )}
+
+  {readingClusters.length > 0 && (
+    <footer class="reading-card__footer">
+      <ul class="reading-card__clusters" role="list" aria-label="Clusters">
+        {readingClusters.map((c) => (
+          <li><Tag color={c.color}>{c.label}</Tag></li>
+        ))}
+      </ul>
+    </footer>
+  )}
+</article>
+
+<style>
+  .reading-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .reading-card__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .reading-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .reading-card__type {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .reading-card__status {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+
+  .reading-card__status--reading {
+    background-color: #FFF7ED;
+    color: #C2410C;
+  }
+
+  .reading-card__status--completed {
+    background-color: #F0FDF4;
+    color: #15803D;
+  }
+
+  .reading-card__status--wanttoread {
+    background-color: #F9FAFB;
+    color: #6B7280;
+  }
+
+  .reading-card__title {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .reading-card__author {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .reading-card__rating {
+    display: flex;
+    gap: 2px;
+  }
+
+  .reading-card__star {
+    font-size: 0.875rem;
+    color: var(--color-border);
+  }
+
+  .reading-card__star--filled {
+    color: var(--color-accent);
+  }
+
+  .reading-card__note {
+    flex: 1;
+  }
+
+  .reading-card__footer {
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .reading-card__clusters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+</style>

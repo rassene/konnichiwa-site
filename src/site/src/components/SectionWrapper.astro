@@ -1,16 +1,18 @@
 ---
 // Shell layer — standard section container with padding, max-width, and scroll anchor.
 interface Props {
-  id?: string;     // scroll anchor id
-  class?: string;  // extra classes from parent
+  id?: string;          // scroll anchor id
+  class?: string;       // extra classes from parent
+  'aria-label'?: string;
 }
 
-const { id, class: className } = Astro.props;
+const { id, class: className, 'aria-label': ariaLabel } = Astro.props;
 ---
 
 <section
   id={id}
   class:list={['section-wrapper', className]}
+  aria-label={ariaLabel}
 >
   <div class="section-wrapper__inner">
     <slot />

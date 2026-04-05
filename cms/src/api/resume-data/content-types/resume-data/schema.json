@@ -1,0 +1,39 @@
+{
+  "kind": "singleType",
+  "collectionName": "resume_data",
+  "info": {
+    "singularName": "resume-data",
+    "pluralName": "resume-datas",
+    "displayName": "Resume Data",
+    "description": "Owner's resume / CV content"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "downloadUrl": {
+      "type": "string",
+      "required": true
+    },
+    "education": {
+      "type": "json",
+      "required": true
+    },
+    "experience": {
+      "type": "json",
+      "required": true
+    },
+    "skills": {
+      "type": "json",
+      "required": true
+    },
+    "languages": {
+      "type": "json",
+      "required": true
+    },
+    "certifications": {
+      "type": "json"
+    }
+  }
+}

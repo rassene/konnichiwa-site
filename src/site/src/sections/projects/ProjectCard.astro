@@ -1,0 +1,165 @@
+---
+// Shell layer — project card, compact and featured variants. Zero JS.
+import type { IProject } from '../../content/interfaces/index.js';
+import StatusBadge from './StatusBadge.astro';
+import Tag from '../../components/Tag.astro';
+
+interface Props {
+  project: IProject;
+  featured?: boolean;
+}
+
+const { project, featured = false } = Astro.props;
+const coverImage = project.media?.[0];
+---
+
+<article class:list={['project-card', { 'project-card--featured': featured }]}>
+  {coverImage && (
+    <div class="project-card__image">
+      <img
+        src={coverImage.url}
+        alt={coverImage.alt}
+        width={coverImage.width}
+        height={coverImage.height}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  )}
+  <div class="project-card__body">
+    <div class="project-card__meta">
+      <StatusBadge status={project.status} />
+      {project.startDate && (
+        <time class="project-card__date" datetime={project.startDate}>
+          {new Date(project.startDate).getFullYear()}
+        </time>
+      )}
+    </div>
+    <h2 class:list={['project-card__title', { 'project-card__title--featured': featured }]}>
+      {featured ? (
+        <a href={`/projects/${project.slug}`} class="project-card__link">
+          {project.title}
+        </a>
+      ) : project.title}
+    </h2>
+    <p class="project-card__desc">{project.description}</p>
+    {project.tags.length > 0 && (
+      <ul class="project-card__tags" role="list" aria-label="Tags">
+        {project.tags.slice(0, 5).map((tag) => (
+          <li><Tag>{tag}</Tag></li>
+        ))}
+      </ul>
+    )}
+    {featured && (
+      <a href={`/projects/${project.slug}`} class="project-card__cta" aria-label={`View ${project.title}`}>
+        Read more →
+      </a>
+    )}
+  </div>
+</article>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: box-shadow var(--motion-base), transform var(--motion-base);
+  }
+
+  .project-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    transform: translateY(-2px);
+  }
+
+  .project-card--featured {
+    border-color: var(--color-accent);
+    border-width: 2px;
+  }
+
+  .project-card__image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .project-card--featured .project-card__image img {
+    height: 280px;
+  }
+
+  .project-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    flex: 1;
+  }
+
+  .project-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .project-card__date {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .project-card__title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .project-card__title--featured {
+    font-size: 1.5rem;
+  }
+
+  .project-card__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .project-card__link:hover {
+    color: var(--color-accent);
+  }
+
+  .project-card__desc {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .project-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    list-style: none;
+    padding: 0;
+    margin: var(--space-xs) 0 0;
+  }
+
+  .project-card__cta {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+    margin-top: auto;
+    padding-top: var(--space-sm);
+    transition: opacity var(--motion-fast);
+  }
+
+  .project-card__cta:hover {
+    opacity: 0.75;
+  }
+</style>

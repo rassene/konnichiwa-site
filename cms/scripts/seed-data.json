@@ -1,0 +1,142 @@
+{
+  "_comment": "Sample seed data for local Strapi development. Import via Strapi admin UI or a custom seed script.",
+  "interest-clusters": [
+    {
+      "slug": "tech-code",
+      "label": "Tech & Code",
+      "description": "Software engineering, programming languages, tools, and technology culture.",
+      "color": "#4A90D9"
+    },
+    {
+      "slug": "books-ideas",
+      "label": "Books & Ideas",
+      "description": "Literature, non-fiction, philosophy, and the ideas that shape how we see the world.",
+      "color": "#9B59B6"
+    }
+  ],
+  "projects": [
+    {
+      "slug": "konnichiwa-site",
+      "title": "konnichiwa. — Personal Website",
+      "status": "in-progress",
+      "description": "A multi-tier personal site built with Astro, React, ASP.NET Core, and Strapi. My corner of the internet.",
+      "body": "## Overview\n\nThis site is built as a full-stack monorepo: public Astro site, React Admin PWA, .NET 10 API, and Strapi CMS — all hosted on Azure.",
+      "tags": ["astro", "react", "dotnet", "azure", "strapi"],
+      "links": [{ "label": "GitHub", "url": "https://github.com" }],
+      "featured": true
+    },
+    {
+      "slug": "reading-tracker",
+      "title": "Reading Tracker",
+      "status": "completed",
+      "description": "A small CLI tool to track books, articles, and papers. Syncs to a local SQLite database.",
+      "tags": ["python", "sqlite", "cli"],
+      "links": [],
+      "featured": false
+    },
+    {
+      "slug": "open-source-contribution",
+      "title": "Open Source Contributions",
+      "status": "in-progress",
+      "description": "Ongoing contributions to open source projects across frontend tooling and developer experience.",
+      "tags": ["open-source", "typescript"],
+      "featured": false
+    }
+  ],
+  "readings": [
+    {
+      "title": "A Philosophy of Software Design",
+      "author": "John Ousterhout",
+      "type": "book",
+      "status": "completed",
+      "rating": 5,
+      "note": "One of the most concise, practical takes on software complexity I've read.",
+      "noteIsGated": false,
+      "dateAdded": "2025-11-01",
+      "clusters": ["tech-code"]
+    },
+    {
+      "title": "The Pragmatic Programmer",
+      "author": "David Thomas & Andrew Hunt",
+      "type": "book",
+      "status": "completed",
+      "rating": 4,
+      "note": "Timeless advice. Some examples are dated but the principles hold up.",
+      "noteIsGated": false,
+      "dateAdded": "2025-09-15",
+      "clusters": ["tech-code"]
+    },
+    {
+      "title": "Thinking, Fast and Slow",
+      "author": "Daniel Kahneman",
+      "type": "book",
+      "status": "completed",
+      "rating": 5,
+      "note": "Changed how I think about my own decision-making. Subscriber-only reflection in the note.",
+      "noteIsGated": true,
+      "dateAdded": "2025-07-10",
+      "clusters": ["books-ideas"]
+    },
+    {
+      "title": "The Pragmatic Engineer Newsletter",
+      "author": "Gergely Orosz",
+      "type": "article",
+      "status": "reading",
+      "rating": 4,
+      "noteIsGated": false,
+      "dateAdded": "2026-01-01",
+      "clusters": ["tech-code"]
+    },
+    {
+      "title": "Middlemarch",
+      "author": "George Eliot",
+      "type": "book",
+      "status": "want-to-read",
+      "noteIsGated": false,
+      "dateAdded": "2026-03-01",
+      "clusters": ["books-ideas"]
+    }
+  ],
+  "resume-data": {
+    "downloadUrl": "https://placeholder.blob.core.windows.net/assets/resume.pdf",
+    "education": [
+      {
+        "institution": "University Placeholder",
+        "degree": "Bachelor of Science",
+        "field": "Computer Science",
+        "startYear": 2020,
+        "endYear": 2024,
+        "description": "Focus on software engineering and distributed systems."
+      }
+    ],
+    "experience": [
+      {
+        "company": "Placeholder Company",
+        "role": "Software Engineer",
+        "startDate": "2024-09",
+        "description": "Building scalable web services and internal tooling.",
+        "highlights": ["Reduced API latency by 40%", "Led migration to .NET 8"]
+      }
+    ],
+    "skills": [
+      {
+        "category": "Programming",
+        "items": ["TypeScript", "C#", "Python", "SQL"]
+      },
+      {
+        "category": "Frameworks",
+        "items": ["Astro", "React", "ASP.NET Core", "Entity Framework Core"]
+      },
+      {
+        "category": "Tools",
+        "items": ["Azure", "Docker", "Git", "Strapi"]
+      }
+    ],
+    "languages": [
+      { "name": "English", "proficiency": "fluent" },
+      { "name": "French", "proficiency": "native" },
+      { "name": "Arabic", "proficiency": "native" }
+    ],
+    "certifications": []
+  }
+}

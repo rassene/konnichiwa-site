@@ -1,0 +1,330 @@
+---
+// Shell layer — full resume renderer. Zero JS. Includes print stylesheet.
+import type { IResumeData } from '../../content/interfaces/index.js';
+import DownloadResumeButton from './DownloadResumeButton.astro';
+
+interface Props {
+  resume: IResumeData;
+}
+
+const { resume } = Astro.props;
+
+const PROFICIENCY_LABELS: Record<string, string> = {
+  native:         'Native',
+  fluent:         'Fluent',
+  professional:   'Professional',
+  conversational: 'Conversational',
+  basic:          'Basic',
+};
+---
+
+<article class="resume" aria-label="Resume">
+  <header class="resume__header">
+    <div class="resume__header-copy">
+      <h1 class="resume__name">Your Name</h1>
+      <p class="resume__tagline">Software Engineer</p>
+    </div>
+    <DownloadResumeButton downloadUrl={resume.downloadUrl} />
+  </header>
+
+  {resume.experience.length > 0 && (
+    <section class="resume__section" aria-labelledby="resume-experience">
+      <h2 class="resume__section-title" id="resume-experience">Experience</h2>
+      <ul class="resume__entries" role="list">
+        {resume.experience.map((e) => (
+          <li class="resume__entry">
+            <div class="resume__entry-header">
+              <div>
+                <strong class="resume__entry-role">{e.role}</strong>
+                <span class="resume__entry-company"> at {e.company}</span>
+              </div>
+              <time class="resume__entry-date">
+                {e.startDate}{e.endDate ? ` – ${e.endDate}` : ' – Present'}
+              </time>
+            </div>
+            <p class="resume__entry-desc">{e.description}</p>
+            {e.highlights && e.highlights.length > 0 && (
+              <ul class="resume__highlights" role="list">
+                {e.highlights.map((h) => <li>{h}</li>)}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {resume.education.length > 0 && (
+    <section class="resume__section" aria-labelledby="resume-education">
+      <h2 class="resume__section-title" id="resume-education">Education</h2>
+      <ul class="resume__entries" role="list">
+        {resume.education.map((e) => (
+          <li class="resume__entry">
+            <div class="resume__entry-header">
+              <div>
+                <strong class="resume__entry-role">{e.degree} in {e.field}</strong>
+                <span class="resume__entry-company"> · {e.institution}</span>
+              </div>
+              <time class="resume__entry-date">
+                {e.startYear}{e.endYear ? ` – ${e.endYear}` : ' – Present'}
+              </time>
+            </div>
+            {e.description && <p class="resume__entry-desc">{e.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {resume.skills.length > 0 && (
+    <section class="resume__section" aria-labelledby="resume-skills">
+      <h2 class="resume__section-title" id="resume-skills">Skills</h2>
+      <dl class="resume__skills">
+        {resume.skills.map((group) => (
+          <>
+            <dt class="resume__skill-category">{group.category}</dt>
+            <dd class="resume__skill-items">
+              {group.items.join(', ')}
+            </dd>
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  {resume.languages.length > 0 && (
+    <section class="resume__section" aria-labelledby="resume-languages">
+      <h2 class="resume__section-title" id="resume-languages">Languages</h2>
+      <ul class="resume__lang-list" role="list">
+        {resume.languages.map((l) => (
+          <li class="resume__lang-item">
+            <span class="resume__lang-name">{l.name}</span>
+            <span class="resume__lang-level">{PROFICIENCY_LABELS[l.proficiency] ?? l.proficiency}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {resume.certifications && resume.certifications.length > 0 && (
+    <section class="resume__section" aria-labelledby="resume-certs">
+      <h2 class="resume__section-title" id="resume-certs">Certifications</h2>
+      <ul class="resume__entries" role="list">
+        {resume.certifications.map((c) => (
+          <li class="resume__entry resume__entry--cert">
+            <strong class="resume__entry-role">{c.name}</strong>
+            <span class="resume__entry-company"> · {c.issuer}</span>
+            <time class="resume__entry-date">{c.issuedAt}</time>
+            {c.url && (
+              <a href={c.url} class="resume__cert-link" target="_blank" rel="noopener noreferrer">
+                View ↗
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</article>
+
+<style>
+  .resume {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
+
+  .resume__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-xl);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .resume__name {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .resume__tagline {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    margin: var(--space-xs) 0 0;
+  }
+
+  .resume__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .resume__section-title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+    margin: 0;
+  }
+
+  .resume__entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .resume__entry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .resume__entry--cert {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .resume__entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .resume__entry-role {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .resume__entry-company {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-muted);
+  }
+
+  .resume__entry-date {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .resume__entry-desc {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .resume__highlights {
+    padding-left: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .resume__highlights li {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .resume__skills {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-sm) var(--space-lg);
+    margin: 0;
+  }
+
+  .resume__skill-category {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    padding-top: 2px;
+  }
+
+  .resume__skill-items {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .resume__lang-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .resume__lang-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 120px;
+  }
+
+  .resume__lang-name {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .resume__lang-level {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .resume__cert-link {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  /* Print stylesheet */
+  @media print {
+    .resume {
+      gap: 1.5rem;
+    }
+
+    .resume__header {
+      padding-bottom: 1rem;
+    }
+
+    .resume__name {
+      font-size: 2rem;
+    }
+
+    :global(.download-btn) {
+      display: none;
+    }
+  }
+</style>

@@ -125,3 +125,9 @@ export interface IResumeData {
   languages: ILanguage[];
   certifications?: ICertification[];
 }
+
+export interface ISiteLink {
+  label: string;
+  url: string;
+  icon?: string;  // optional icon identifier (e.g. "github", "linkedin")
+}

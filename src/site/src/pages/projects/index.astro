@@ -1,0 +1,15 @@
+---
+// Projects index page — shell layer, T044.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectGrid from '../../sections/projects/ProjectGrid.astro';
+import { content } from '../../content/index.js';
+
+const projects = await content.getProjects();
+---
+
+<BaseLayout
+  title="Projects"
+  description="Things I build — ideas, work-in-progress, and shipped."
+>
+  <ProjectGrid projects={projects} />
+</BaseLayout>

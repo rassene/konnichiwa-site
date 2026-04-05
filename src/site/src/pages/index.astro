@@ -1,10 +1,18 @@
 ---
-// Home page — shell using BaseLayout. Full content implemented in Phase 3 (T039).
+// Home page — shell layer, T039.
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroBlock from '../sections/home/HeroBlock.astro';
+import IdentityStrip from '../sections/home/IdentityStrip.astro';
+import SectionPreviewGrid from '../sections/home/SectionPreviewGrid.astro';
+import NewsletterCTA from '../sections/home/NewsletterCTA.astro';
 ---
 
-<BaseLayout title="Home">
-  <p style="padding: 4rem 2rem; font-family: sans-serif; color: #6B6B60;">
-    Phase 3 content coming soon.
-  </p>
+<BaseLayout
+  title="Home"
+  description="A personal corner of the internet — projects, readings, musings, and more."
+>
+  <HeroBlock />
+  <IdentityStrip />
+  <SectionPreviewGrid />
+  <NewsletterCTA />
 </BaseLayout>

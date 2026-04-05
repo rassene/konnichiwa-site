@@ -8,6 +8,7 @@ import type {
   IProject,
   IReading,
   IResumeData,
+  ISiteLink,
 } from '../interfaces/index.js';
 
 export interface IContentAdapter {
@@ -20,4 +21,5 @@ export interface IContentAdapter {
   getMusing(slug: string): Promise<IMusingPost | null>;
   getClusters(): Promise<IInterestCluster[]>;
   getResumeData(): Promise<IResumeData>;
+  getSiteLinks(): Promise<ISiteLink[]>;
 }

@@ -1,0 +1,18 @@
+---
+// Readings page — shell layer, T052.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReadingList from '../sections/readings/ReadingList.astro';
+import { content } from '../content/index.js';
+
+const [readings, clusters] = await Promise.all([
+  content.getReadings(),
+  content.getClusters(),
+]);
+---
+
+<BaseLayout
+  title="Readings"
+  description="Books, articles, papers, and more — my reading shelf and notes."
+>
+  <ReadingList readings={readings} clusters={clusters} />
+</BaseLayout>

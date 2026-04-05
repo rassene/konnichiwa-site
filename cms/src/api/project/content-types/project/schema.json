@@ -1,0 +1,63 @@
+{
+  "kind": "collectionType",
+  "collectionName": "projects",
+  "info": {
+    "singularName": "project",
+    "pluralName": "projects",
+    "displayName": "Project",
+    "description": "Personal and professional projects"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["idea", "in-progress", "completed", "paused"],
+      "required": true,
+      "default": "idea"
+    },
+    "description": {
+      "type": "text",
+      "required": true,
+      "maxLength": 200
+    },
+    "body": {
+      "type": "richtext"
+    },
+    "tags": {
+      "type": "json"
+    },
+    "links": {
+      "type": "json"
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "media": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images", "videos"]
+    }
+  }
+}

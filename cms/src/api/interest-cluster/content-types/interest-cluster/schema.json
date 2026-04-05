@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "interest_clusters",
+  "info": {
+    "singularName": "interest-cluster",
+    "pluralName": "interest-clusters",
+    "displayName": "Interest Cluster",
+    "description": "Thematic groupings of content (e.g. Tech & Code, Books & Ideas)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "slug": {
+      "type": "uid",
+      "targetField": "label",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "description": {
+      "type": "text",
+      "required": true,
+      "maxLength": 160
+    },
+    "color": {
+      "type": "string",
+      "required": true,
+      "default": "#4A90D9"
+    },
+    "readings": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::reading.reading",
+      "inversedBy": "clusters"
+    },
+    "musings": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::musing-post.musing-post",
+      "inversedBy": "clusters"
+    }
+  }
+}

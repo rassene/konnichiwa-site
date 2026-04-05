@@ -1,0 +1,204 @@
+---
+// Reach Out page — shell layer, T063.
+// ContactForm is a React island (client:load) — requires interactivity for
+// validation, API submission, success/error states.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionWrapper from '../components/SectionWrapper.astro';
+import ContactForm from '../sections/reach-out/ContactForm.tsx';
+---
+
+<BaseLayout
+  title="Reach Out"
+  description="Say hello — I read every message."
+>
+  <SectionWrapper id="reach-out">
+    <div class="reach-out">
+      <header class="reach-out__header">
+        <h1 class="reach-out__title">Reach Out</h1>
+        <p class="reach-out__desc">
+          I love hearing from people. Whether it's a collaboration idea, a question,
+          or just a hello — drop me a message and I'll get back to you.
+        </p>
+      </header>
+
+      {/* React island — justified: form validation + async API call + state management */}
+      <ContactForm client:load />
+    </div>
+  </SectionWrapper>
+</BaseLayout>
+
+<style>
+  .reach-out {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .reach-out__header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .reach-out__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-md);
+    line-height: 1.1;
+  }
+
+  .reach-out__desc {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ContactForm styles — scoped to this page via global */
+  :global(.contact-form) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  :global(.contact-form--success) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-2xl);
+    background-color: var(--color-accent-soft);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  :global(.contact-form__success-icon) {
+    font-size: 2.5rem;
+    color: #15803D;
+  }
+
+  :global(.contact-form__success-title) {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  :global(.contact-form__success-desc) {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  :global(.contact-form__row) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+  }
+
+  @media (max-width: 560px) {
+    :global(.contact-form__row) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  :global(.contact-form__field) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  :global(.contact-form__label) {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  :global(.contact-form__input),
+  :global(.contact-form__select),
+  :global(.contact-form__textarea) {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color var(--motion-fast);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  :global(.contact-form__input:focus),
+  :global(.contact-form__select:focus),
+  :global(.contact-form__textarea:focus) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-color: var(--color-accent);
+  }
+
+  :global(.contact-form__input--error) {
+    border-color: #DC2626;
+  }
+
+  :global(.contact-form__textarea) {
+    resize: vertical;
+    min-height: 160px;
+  }
+
+  :global(.contact-form__field-footer) {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  :global(.contact-form__error) {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: #DC2626;
+  }
+
+  :global(.contact-form__counter) {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  :global(.contact-form__alert) {
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+  }
+
+  :global(.contact-form__alert--error) {
+    background-color: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+  }
+
+  :global(.contact-form__btn) {
+    align-self: flex-start;
+    padding: var(--space-sm) var(--space-xl);
+    background-color: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity var(--motion-fast);
+  }
+
+  :global(.contact-form__btn:hover:not(:disabled)) {
+    opacity: 0.88;
+  }
+
+  :global(.contact-form__btn:disabled) {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+</style>
